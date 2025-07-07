@@ -1,0 +1,3 @@
+extension MyString on String{
+
+}
