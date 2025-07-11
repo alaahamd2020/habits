@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 
 class TextCustom extends StatelessWidget {
   final String text;
-  final double fontSize;
+  final double? fontSize;
   final TextAlign alignment;
   final Color? color;
   final bool bold;
 
-  const TextCustom(this.text, {this.fontSize = 16, this.alignment = TextAlign.start, this.color, this.bold =false});
+  const TextCustom(this.text, {super.key, this.fontSize, this.alignment = TextAlign.start, this.color, this.bold =false});
 
 
   @override
