@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:habits/habits_model.dart';
+import 'package:habits/model/habits_model.dart';
 import 'package:habits/history.dart';
 
 class FireStoreHabits extends GetxController{
@@ -24,7 +24,7 @@ class FireStoreHabits extends GetxController{
     _habitsCollectionReference.snapshots().listen((snapshot){
       habits.clear();
       for(var item in snapshot.docs){
-        habits.add(HabitsModel.fromJson(item.data() as Map));
+        habits.add(HabitsModel.fromJson(item.data() as Map<String, dynamic>));
       }
       loading.value = false;
       habitsThisWeek();
@@ -47,7 +47,7 @@ class FireStoreHabits extends GetxController{
       print('Error: $e');
     }
   }
-  
+
   /*getThisWeek(){
     _habitsCollectionReference.snapshots().listen((snapshot){
       thisWeek.clear();

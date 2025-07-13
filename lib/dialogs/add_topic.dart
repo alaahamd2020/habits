@@ -6,32 +6,33 @@ import 'package:get/get.dart';
 import 'package:habits/fire_store_habits.dart';
 import 'package:habits/firebase/firebase.dart';
 import 'package:habits/model/habits_model.dart';
+import 'package:habits/model/topic_model.dart';
 import 'package:intl/intl.dart';
 
 import '../widgets/custom_text.dart';
 
-class AddHabit extends StatefulWidget {
-  final String topicId;
-  const AddHabit({super.key, required this.topicId});
+class AddTopic extends StatefulWidget {
+  const AddTopic({super.key});
 
-  static show(BuildContext context, String topicId) {
+  static show(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) {
-        return AddHabit(topicId: topicId,);
+        return AddTopic();
       },
     );
   }
 
   @override
-  State<AddHabit> createState() => _AddHabitState();
+  State<AddTopic> createState() => _AddTopicState();
 }
 
-class _AddHabitState extends State<AddHabit> {
+class _AddTopicState extends State<AddTopic> {
   DateTime _dateTime = DateTime.now();
 
   int _count = 1;
-  
+
+  final titleController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -173,112 +174,9 @@ class _AddHabitState extends State<AddHabit> {
                               color: Theme.of(context).colorScheme.surface,
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: Row(
-                              children: [
-                                // Previous Day Button
-                                IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _dateTime = _dateTime.subtract(
-                                        Duration(days: 1),
-                                      );
-                                    });
-                                  },
-                                  icon: Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.primary.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Icon(
-                                      Icons.chevron_left_rounded,
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.primary,
-                                      size: 24,
-                                    ),
-                                  ),
-                                ),
-
-                                // Date Display
-                                Expanded(
-                                  child: GestureDetector(
-                                    onTap: () async {
-                                      final newDate = await addDate();
-                                      setState(() {
-                                        _dateTime = newDate ?? _dateTime;
-                                      });
-                                    },
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 12,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primaryContainer
-                                            .withOpacity(0.5),
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          TextCustom(
-                                            DateFormat.EEEE(
-                                              'ar',
-                                            ).format(_dateTime),
-                                            alignment: TextAlign.center,
-                                            fontSize: 16,
-                                            bold: true,
-                                            color: Theme.of(
-                                              context,
-                                            ).colorScheme.onPrimaryContainer,
-                                          ),
-                                          const SizedBox(height: 4),
-                                          TextCustom(
-                                            DateFormat('M/d').format(_dateTime),
-                                            alignment: TextAlign.center,
-                                            fontSize: 14,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onPrimaryContainer
-                                                .withOpacity(0.8),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-
-                                // Next Day Button
-                                IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      _dateTime = _dateTime.add(
-                                        Duration(days: 1),
-                                      );
-                                    });
-                                  },
-                                  icon: Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.primary.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Icon(
-                                      Icons.chevron_right_rounded,
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.primary,
-                                      size: 24,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                            child: TextFormField(
+                              controller: titleController,
+                            )
                           ),
                           const SizedBox(height: 16),
                         ],
@@ -491,13 +389,13 @@ class _AddHabitState extends State<AddHabit> {
                             ),
                             child: TextButton(
                               onPressed: () {
-                                FB.addHabit(
-                                  HabitsModel(
-                                    '',
-                                    _count,
-                                    0,
-                                      _dateTime,
-                                       widget.topicId,
+                                FB.addTopic(
+                                  TopicModel(
+                                    title: titleController.text,
+                                    target: _count,
+
+
+
                                   ),
                                 );
                                 Navigator.pop(context);

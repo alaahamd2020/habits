@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habits/binding.dart';
 import 'package:habits/firebase_options.dart';
+import 'package:habits/home.dart';
 import 'package:habits/home_view.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
@@ -28,7 +29,7 @@ class MyApp extends StatelessWidget {
         colorScheme: theme.copyWith(
         ),
       ),
-      home: const HomeView(),
+      home: const Home(),
     );
   }
 }
