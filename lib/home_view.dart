@@ -1,403 +1,426 @@
 import 'package:flutter/material.dart';
 import 'package:habits/dialogs/add_habit.dart';
 import 'package:habits/extension/on_num.dart';
+import 'package:habits/fire_store_habits.dart';
+import 'package:habits/habits_model.dart';
 import 'package:habits/history.dart';
 import 'package:habits/widgets/custom_text.dart';
 import 'package:intl/intl.dart';
+import 'package:get/get.dart';
 
-class HomeView extends StatelessWidget {
+class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
-  int  get target => DateTime.now().difference(DateTime(2025,06,20)).inDays;
+  @override
+  State<HomeView> createState() => _HomeViewState();
+}
 
-  int get targetDays => 60;
-  double get _targetProgress =>(target /targetDays).clamp(0, 1) ;
+class _HomeViewState extends State<HomeView> {
+  final FireStoreHabits controller = Get.find<FireStoreHabits>();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: TextCustom(
-          'Habits',
-          fontSize: 25,
-          bold: true,
-          color: Theme.of(context).colorScheme.onPrimary,
-        ),
-        backgroundColor: Theme.of(context).primaryColor,
-        // backgroundColor: ,
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => AddHabit.show(context),
-        child: Icon(Icons.add),
-      ),
-      body: SingleChildScrollView(
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Theme.of(context).colorScheme.surface,
-                Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
-              ],
+
+    return Obx(() {
+        final isEmpty = controller.habits.isEmpty;
+        final DateTime lastDay = controller.loading.value || isEmpty ? DateTime.now() : controller.habits.last.date!;
+        final int streak = controller.habits.isEmpty ? 0:
+          DateTime.now().difference(lastDay).inDays < 1 ? 0 :
+          DateTime.now().difference(lastDay).inDays -1 ;
+        int targetDays = 7;
+        double _targetProgress = (streak / targetDays).clamp(0, 1) ;
+
+        return Scaffold(
+          appBar: AppBar(
+            title: TextCustom(
+              'Habits',
+              fontSize: 25,
+              bold: true,
+              color: Theme.of(context).colorScheme.onPrimary,
             ),
+            backgroundColor: Theme.of(context).primaryColor,
+            // backgroundColor: ,
           ),
-          width: MediaQuery.sizeOf(context).width,
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Header Goal Card
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Theme.of(context).colorScheme.primary,
-                      Theme.of(context).colorScheme.primary.withOpacity(0.7),
-                      Theme.of(context).colorScheme.secondary.withOpacity(0.8),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.primary.withOpacity(0.4),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
-                      spreadRadius: 2,
-                    ),
-                    BoxShadow(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.secondary.withOpacity(0.2),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () => AddHabit.show(context),
+            child: Icon(Icons.add),
+          ),
+          body: SingleChildScrollView(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Theme.of(context).colorScheme.surface,
+                    Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
                   ],
                 ),
-                padding: const EdgeInsets.all(28),
-                margin: const EdgeInsets.only(bottom: 24),
-                child: Column(
-                  children: [
-                    // Header with icon and title
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+              ),
+              width: MediaQuery.sizeOf(context).width,
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Header Goal Card
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Theme.of(context).colorScheme.primary,
+                          Theme.of(context).colorScheme.primary.withOpacity(0.7),
+                          Theme.of(context).colorScheme.secondary.withOpacity(0.8),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.primary.withOpacity(0.4),
+                          blurRadius: 20,
+                          offset: const Offset(0, 8),
+                          spreadRadius: 2,
+                        ),
+                        BoxShadow(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.secondary.withOpacity(0.2),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    padding: const EdgeInsets.all(28),
+                    margin: const EdgeInsets.only(bottom: 24),
+                    child: Column(
                       children: [
+                        // Header with icon and title
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onPrimary.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(
+                                Icons.track_changes,
+                                size: 28,
+                                color: Theme.of(context).colorScheme.onPrimary,
+                              ),
+                            ),
+                            12.space,
+                            TextCustom(
+                              "Goal",
+                              fontSize: 24,
+                              alignment: TextAlign.center,
+                              color: Theme.of(context).colorScheme.onPrimary,
+                              bold: true,
+                            ),
+                          ],
+                        ),
+
+                        20.space,
+
+                        // Goal Display
                         Container(
-                          padding: const EdgeInsets.all(8),
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 20,
+                          ),
                           decoration: BoxDecoration(
                             color: Theme.of(
                               context,
-                            ).colorScheme.onPrimary.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(
-                            Icons.track_changes,
-                            size: 28,
-                            color: Theme.of(context).colorScheme.onPrimary,
-                          ),
-                        ),
-                        12.space,
-                        TextCustom(
-                          "Goal",
-                          fontSize: 24,
-                          alignment: TextAlign.center,
-                          color: Theme.of(context).colorScheme.onPrimary,
-                          bold: true,
-                        ),
-                      ],
-                    ),
-
-                    20.space,
-
-                    // Goal Display
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 20,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onPrimary.withOpacity(0.95),
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          // Large Goal number
-                          ShaderMask(
-                            shaderCallback: (bounds) => LinearGradient(
-                              colors: [
-                                Theme.of(context).colorScheme.primary,
-                                Theme.of(context).colorScheme.secondary,
-                              ],
-                            ).createShader(bounds),
-                            child: Text(
-                              "10",
-                              style: TextStyle(
-                                fontSize: 56,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                            ).colorScheme.onPrimary.withOpacity(0.95),
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
                               ),
-                              textAlign: TextAlign.center,
-                            ),
+                            ],
                           ),
+                          child: Column(
+                            children: [
+                              // Large Goal number
+                              ShaderMask(
+                                shaderCallback: (bounds) => LinearGradient(
+                                  colors: [
+                                    Theme.of(context).colorScheme.primary,
+                                    Theme.of(context).colorScheme.secondary,
+                                  ],
+                                ).createShader(bounds),
+                                child: Text(
+                                  streak.toString(),
+                                  style: TextStyle(
+                                    fontSize: 56,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
 
-                          8.space,
+                              8.space,
 
-                          // Goal description
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.primary.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: TextCustom(
-                              "Days",
-                              fontSize: 14,
-                              color: Theme.of(context).colorScheme.primary,
-                              alignment: TextAlign.center,
-                              bold: true,
-                            ),
+                              // Goal description
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: TextCustom(
+                                  "Days",
+                                  fontSize: 14,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  alignment: TextAlign.center,
+                                  bold: true,
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ),
+                        ),
 
-                    16.space,
+                        16.space,
 
-                    // Progress indicator
-                    Container(
-                      width: double.infinity,
-                      height: 6,
-                      decoration: BoxDecoration(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onPrimary.withOpacity(0.3),
-                        borderRadius: BorderRadius.circular(3),
-                      ),
-                      child: FractionallySizedBox(
-                        widthFactor: _targetProgress, // 60% progress
-                        alignment: Alignment.centerLeft,
-                        child: Container(
+                        // Progress indicator
+                        Container(
+                          width: double.infinity,
+                          height: 6,
                           decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Theme.of(context).colorScheme.onPrimary,
-                                Theme.of(
-                                  context,
-                                ).colorScheme.onPrimary.withOpacity(0.8),
-                              ],
-                            ),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onPrimary.withOpacity(0.3),
                             borderRadius: BorderRadius.circular(3),
                           ),
+                          child: FractionallySizedBox(
+                            widthFactor: _targetProgress, // 60% progress
+                            alignment: Alignment.centerLeft,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Theme.of(context).colorScheme.onPrimary,
+                                    Theme.of(
+                                      context,
+                                    ).colorScheme.onPrimary.withOpacity(0.8),
+                                  ],
+                                ),
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
 
-                    16.space,
+                        16.space,
 
-                    // Progress text
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        TextCustom(
-                          "Target",
-                          fontSize: 12,
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onPrimary.withOpacity(0.8),
-                        ),
-                        TextCustom(
-                          "${(_targetProgress * 100).round()}%",
-                          fontSize: 12,
-                          color: Theme.of(context).colorScheme.onPrimary,
-                          bold: true,
+                        // Progress text
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            TextCustom(
+                              "Target",
+                              fontSize: 12,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onPrimary.withOpacity(0.8),
+                            ),
+                            TextCustom(
+                              "${(_targetProgress * 100).round()}%",
+                              fontSize: 12,
+                              color: Theme.of(context).colorScheme.onPrimary,
+                              bold: true,
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
-                ),
-              ),
+                  ),
 
-              // Last Activity Card
-              _buildInfoCard(
-                context,
-                title: 'The Last',
-                icon: Icons.history,
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.outline.withOpacity(0.2),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildInfoColumn(
-                        context,
-                        "Day",
-                        "Saturday",
-                        Icons.calendar_today,
-                      ),
-                      Container(
-                        width: 1,
-                        height: 40,
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.outline.withOpacity(0.3),
-                      ),
-                      _buildInfoColumn(
-                        context,
-                        "Date",
-                        "2025/7/7",
-                        Icons.date_range,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Total Days Card
-              _buildInfoCard(
-                context,
-                title: 'Total Times in This Period',
-                icon: Icons.today,
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.outline.withOpacity(0.2),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildStatsColumn(context, "This Week", "5", false),
-                      _buildStatsColumn(context, "This Day", "2", true),
-                      _buildStatsColumn(context, "This Month", "30", false),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Longest Streak Card
-              _buildInfoCard(
-                context,
-                title: 'Longest Streak',
-                icon: Icons.trending_up,
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.outline.withOpacity(0.2),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildRankColumn(context, "2th", "3 Days", "🥈"),
-                      _buildRankColumn(context, "1st", "5 Days", "🥇"),
-                      _buildRankColumn(context, "3th", "2 Days", "🥉"),
-                    ],
-                  ),
-                ),
-              ),
-
-              32.space,
-
-              // Action Button
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Theme.of(context).colorScheme.primary,
-                      Theme.of(context).colorScheme.primary.withOpacity(0.8),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.primary.withOpacity(0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: TextButton(
-                  onPressed: () => Navigator.push(
+                  // Last Activity Card
+                  _buildInfoCard(
                     context,
-                    MaterialPageRoute(builder: (context) => history()),
-                  ),
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStateProperty.all(
-                      Colors.transparent,
-                    ),
-                    minimumSize: WidgetStateProperty.all(
-                      Size(MediaQuery.sizeOf(context).width * 0.9, 56),
-                    ),
-                    shape: WidgetStateProperty.all(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                    title: 'The Last',
+                    icon: Icons.history,
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.outline.withOpacity(0.2),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _buildInfoColumn(
+                            context,
+                            "Day",
+                            DateFormat('EEEE').format(lastDay),
+                            Icons.calendar_today,
+                          ),
+                          Container(
+                            width: 1,
+                            height: 40,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.outline.withOpacity(0.3),
+                          ),
+                          _buildInfoColumn(
+                            context,
+                            "Date",
+                            DateFormat('yyyy/MM/dd').format(lastDay),
+                            Icons.date_range,
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.history,
-                        color: Theme.of(context).colorScheme.onPrimary,
-                        size: 24,
+
+                  // Total Days Card
+                  _buildInfoCard(
+                    context,
+                    title: 'Total Times in This Period',
+                    icon: Icons.today,
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.outline.withOpacity(0.2),
+                        ),
                       ),
-                      12.space,
-                      TextCustom(
-                        'Habit History',
-                        fontSize: 18,
-                        bold: true,
-                        color: Theme.of(context).colorScheme.onPrimary,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _buildStatsColumn(context, "This Week",
+                              (controller.thisWeek.fold(0, (prev, HabitsModel model)=> prev + int.parse(model.times!))).toString(),
+                              false),
+                          _buildStatsColumn(context, "This Day",
+                              (controller.thisDay.fold(0, (prev, HabitsModel model)=> prev+int.parse(model.times!))).toString(),
+                              true),
+                          _buildStatsColumn(context, "This Month",
+                              (controller.thisMonth.fold(0, (prev, HabitsModel model)=>prev + int.parse(model.times!))).toString(),
+                              false),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
+
+                  // Longest Streak Card
+                  _buildInfoCard(
+                    context,
+                    title: 'Longest Streak',
+                    icon: Icons.trending_up,
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.outline.withOpacity(0.2),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _buildRankColumn(context, "2th", "3 Days", "🥈"),
+                          _buildRankColumn(context, "1st", "5 Days", "🥇"),
+                          _buildRankColumn(context, "3th", "2 Days", "🥉"),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  32.space,
+
+                  // Action Button
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Theme.of(context).colorScheme.primary,
+                          Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.primary.withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: TextButton(
+                      onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => history()),
+                      ),
+                      style: ButtonStyle(
+                        backgroundColor: WidgetStateProperty.all(
+                          Colors.transparent,
+                        ),
+                        minimumSize: WidgetStateProperty.all(
+                          Size(MediaQuery.sizeOf(context).width * 0.9, 56),
+                        ),
+                        shape: WidgetStateProperty.all(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.history,
+                            color: Theme.of(context).colorScheme.onPrimary,
+                            size: 24,
+                          ),
+                          12.space,
+                          TextCustom(
+                            'Habit History',
+                            fontSize: 18,
+                            bold: true,
+                            color: Theme.of(context).colorScheme.onPrimary,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      }
     );
   }
 
@@ -576,6 +599,4 @@ class HomeView extends StatelessWidget {
       ),
     );
   }
-
-
 }

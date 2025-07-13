@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:habits/fire_store_habits.dart';
 import 'package:habits/widgets/custom_text.dart';
 
 class DeleteHabit extends StatefulWidget {
-  const DeleteHabit({Key? key}) : super(key: key);
+  final String id;
+
+
+  DeleteHabit({required this.id});
 
   static show(BuildContext context, String id){
     showDialog(
         context: context,
         builder: (context){
-          return DeleteHabit();
+          return DeleteHabit(id: id,);
         });
   }
   @override
@@ -51,7 +55,7 @@ class _DeleteHabitState extends State<DeleteHabit> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              // Add delete logic here
+              FireStoreHabits().delete(widget.id);
             },
             child: TextCustom(
               'Delete',
