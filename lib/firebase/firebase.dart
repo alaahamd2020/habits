@@ -19,7 +19,7 @@ class FB {
       _habitsDataReference(userId, topicId).snapshots().map((event) {
         return event.docs
             .map((e) => HabitsModel.fromJson(e.data() as Map<String, dynamic>))
-            .toList();
+            .toList().. sort((a, b) => a.date.compareTo(b.date)); 
       });
 
   static Future<void> addHabit(HabitsModel model) async {
@@ -33,11 +33,10 @@ class FB {
   }
 
   static void addTopic(TopicModel topicModel) {
-    final doc = _topicsReference(topicModel.userId).doc();
+    final doc = _topicsReference(topicModel.userId).doc(topicModel.id);
     topicModel.id ??= doc.id;
     doc.set(topicModel.toJson());
   }
-
   static get allTopics {
     return _topicsReference('3XkMSppPiUbDU2fyjme0').snapshots().map((event) {
       return event.docs

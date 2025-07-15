@@ -23,7 +23,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      initialBinding: Binding(),
       title: 'Habits',
       theme: ThemeData(
         colorScheme: theme.copyWith(

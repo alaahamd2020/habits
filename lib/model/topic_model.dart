@@ -24,9 +24,8 @@ class TopicModel{
   factory TopicModel.fromJson(Map<String, dynamic> json) => _$TopicModelFromJson(json);
 
   int currentStreak(DateTime? lastHabitDate) {
-    print(lastHabitDate);
-    print(createdAt);
-    return DateTime.now().difference(lastHabitDate  ?? createdAt).inDays-1;
+    final result = Timestamp.now().toDate().difference(lastHabitDate  ?? createdAt).inDays-1;
+    return result < 0 ? 0 : result;
   }
 
   Map<String, dynamic> toJson() => _$TopicModelToJson(this);

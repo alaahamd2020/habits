@@ -1,43 +1,41 @@
 import 'dart:ui';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:habits/fire_store_habits.dart';
+import 'package:habits/extension/on_date_time.dart';
 import 'package:habits/firebase/firebase.dart';
 import 'package:habits/model/habits_model.dart';
+import 'package:habits/model/topic_model.dart';
 import 'package:intl/intl.dart';
-
 import '../widgets/custom_text.dart';
 
 class AddHabit extends StatefulWidget {
-  final String topicId;
-  const AddHabit({super.key, required this.topicId});
-
-  static show(BuildContext context, String topicId) {
+  final TopicModel topicModel;
+  const AddHabit({super.key, required this.topicModel});
+  static show(BuildContext context, TopicModel topicModel) {
     showDialog(
       context: context,
       builder: (context) {
-        return AddHabit(topicId: topicId,);
+        return AddHabit(topicModel: topicModel,);
       },
     );
   }
-
   @override
   State<AddHabit> createState() => _AddHabitState();
 }
 
 class _AddHabitState extends State<AddHabit> {
-  DateTime _dateTime = DateTime.now();
+  DateTime _dateTime = Timestamp.now().toDate();
 
   int _count = 1;
   
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder(
-      init: FireStoreHabits(),
-      builder: (controller) {
+    return StreamBuilder(
+      stream: FB.allHabits(widget.topicModel.userId, widget.topicModel.id!),
+      builder: (context, asyncSnapshot) {
+        final list = asyncSnapshot.data ?? [];
+        DateTime lastDay = list.lastOrNull?.date.toDate() ?? widget.topicModel.createdAt;
         return BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Dialog(
@@ -286,7 +284,6 @@ class _AddHabitState extends State<AddHabit> {
                     ),
 
                     const SizedBox(height: 16),
-
                     // Count Selection Section
                     Container(
                       decoration: BoxDecoration(
@@ -495,9 +492,9 @@ class _AddHabitState extends State<AddHabit> {
                                   HabitsModel(
                                     '',
                                     _count,
-                                    0,
-                                      _dateTime,
-                                       widget.topicId,
+                                    widget.topicModel.currentStreak(lastDay),
+                                    _dateTime.toTimestamp,
+                                    widget.topicModel.id!,
                                   ),
                                 );
                                 Navigator.pop(context);

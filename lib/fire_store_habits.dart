@@ -1,8 +1,7 @@
+/*
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:habits/model/habits_model.dart';
-import 'package:habits/history.dart';
 
 class FireStoreHabits extends GetxController{
   final CollectionReference _habitsCollectionReference = FirebaseFirestore.instance.collection('Habits');
@@ -48,19 +47,21 @@ class FireStoreHabits extends GetxController{
     }
   }
 
-  /*getThisWeek(){
+  */
+/*getThisWeek(){
     _habitsCollectionReference.snapshots().listen((snapshot){
       thisWeek.clear();
       for (var item in snapshot.docs){
         thisWeek.add(HabitsModel.fromJson(item.data() as Map));
       }
     });
-  }*/
+  }*//*
+
 
   habitsThisWeek(){
     thisWeek.clear();
     for(var item in habits){
-      if(DateTime.now().difference(item.date!).inDays <=7)
+      if(DateTime.now().difference(item.date.toDate()).inDays <=7)
         thisWeek.add(item);
     }
   }
@@ -68,16 +69,18 @@ class FireStoreHabits extends GetxController{
   habitsThisDay(){
     thisDay.clear();
     for(var item in habits){
-      if(DateTime.now().difference(item.date!).inDays ==0)
+      if(DateTime.now().difference(item.date.toDate()).inDays ==0) {
         thisDay.add(item);
+      }
     }
   }
 
   habitsThisMonth(){
       thisMonth.clear();
       for(var item in habits){
-        if(DateTime.now().difference(item.date!).inDays <= 30)
+        if(DateTime.now().difference(item.date.toDate()).inDays <= 30) {
           thisMonth.add(item);
+        }
       }
   }
 
@@ -85,5 +88,4 @@ class FireStoreHabits extends GetxController{
   //   return habits
   // }
 
-
-}
+}*/

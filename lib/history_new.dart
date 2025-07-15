@@ -10,22 +10,15 @@ import 'package:intl/intl.dart';
 
 import 'model/topic_model.dart';
 
-class History extends StatefulWidget {
+class History extends StatelessWidget {
   final TopicModel topicModel;
   const History({super.key, required this.topicModel});
-
-  @override
-  State<History> createState() => _HistoryState();
-
-}
-
-class _HistoryState extends State<History> {
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: StreamBuilder(
-        stream: FB.allHabits(widget.topicModel.userId, widget.topicModel.id!),
+        stream: FB.allHabits(topicModel.userId, topicModel.id!),
         builder: (context,snapshot) {
 
           final list = snapshot.data ?? [];
@@ -89,7 +82,7 @@ class _HistoryState extends State<History> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 TextCustom(
-                                  'Habits History',
+                                  '${topicModel.title} History',
                                   fontSize: 24,
                                   bold: true,
                                   color: Theme.of(context).colorScheme.onPrimary,
@@ -151,7 +144,7 @@ class _HistoryState extends State<History> {
                                 context,
                                 icon: Icons.calendar_today,
                                 title: 'Total Days',
-                                value: DateTime.now().difference( list.firstOrNull?.date ?? DateTime.now()).inDays.toString(),
+                                value: "${list.totalDays(topicModel.createdAt)}",
                                 color: Theme.of(context).colorScheme.primary,
                               ),
                               _buildVerticalDivider(context),
@@ -167,7 +160,7 @@ class _HistoryState extends State<History> {
                                 context,
                                 icon: Icons.trending_up,
                                 title: 'Streak',
-                                value: list.totalStreak(DateTime.now()),
+                                value: list.totalStreak(topicModel.createdAt).toString(),
                                 color: Colors.green,
                               ),
                             ],
@@ -342,7 +335,7 @@ class _HistoryState extends State<History> {
                     ),
                     const SizedBox(width: 4),
                     TextCustom(
-                      DateFormat('MM/dd - EEE').format(item.date),
+                      DateFormat('MM/dd - EEE').format(item.date.toDate()),
                       fontSize: 16,
                       bold: true,
                       color: Theme.of(context).colorScheme.onSurface,

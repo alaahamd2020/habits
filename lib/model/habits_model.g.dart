@@ -11,7 +11,7 @@ HabitsModel _$HabitsModelFromJson(Map<String, dynamic> json) =>
         json['id'] as String,
         (json['times'] as num).toInt(),
         (json['streak'] as num).toInt(),
-        DateTime.parse(json['date'] as String),
+        const MyConverter().fromJson(json['date']),
         json['topicId'] as String,
       )
       ..createdAt = DateTime.parse(json['created_at'] as String)
@@ -22,7 +22,7 @@ Map<String, dynamic> _$HabitsModelToJson(HabitsModel instance) =>
       'id': instance.id,
       'times': instance.times,
       'streak': instance.streak,
-      'date': instance.date.toIso8601String(),
+      'date': const MyConverter().toJson(instance.date),
       'created_at': instance.createdAt.toIso8601String(),
       'userId': instance.userId,
       'topicId': instance.topicId,

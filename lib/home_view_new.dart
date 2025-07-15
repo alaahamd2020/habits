@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:habits/dialogs/add_habit.dart';
 import 'package:habits/extension/on_num.dart';
-import 'package:habits/fire_store_habits.dart';
 import 'package:habits/firebase/firebase.dart';
 import 'package:habits/history_new.dart';
 import 'package:habits/model/habits_model.dart';
 import 'package:habits/widgets/custom_text.dart';
 import 'package:intl/intl.dart';
-import 'package:get/get.dart';
-
 import 'model/topic_model.dart';
 
 class HomeView extends StatelessWidget {
@@ -21,7 +18,7 @@ class HomeView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: TextCustom(
-          'Habits',
+          topic.title,
           fontSize: 25,
           bold: true,
           color: Theme.of(context).colorScheme.onPrimary,
@@ -30,7 +27,7 @@ class HomeView extends StatelessWidget {
         // backgroundColor: ,
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => AddHabit.show(context, topic.id!),
+        onPressed: () => AddHabit.show(context, topic),
         child: Icon(Icons.add),
       ),
       body: SingleChildScrollView(
@@ -51,8 +48,9 @@ class HomeView extends StatelessWidget {
             stream: FB.allHabits(topic.userId, topic.id!),
             builder: (context, asyncSnapshot) {
               final list = asyncSnapshot.data ?? [];
-              final double targetProgress = (list.totalStreak(topic.createdAt) / topic.target).clamp(0, 1);
-              DateTime lastDay = list.lastOrNull?.date ?? DateTime.now();
+              DateTime lastDay = list.lastOrNull?.date.toDate() ?? topic.createdAt;
+              final double targetProgress = (topic.currentStreak(lastDay) / topic.target).clamp(0, 1);
+              final listSortedStreak = list.where((element) => element.streak > 0).toList()..sort((a, b) => b.streak.compareTo(a.streak));
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -153,7 +151,7 @@ class HomeView extends StatelessWidget {
                                   ],
                                 ).createShader(bounds),
                                 child: Text(
-                                  "${topic.currentStreak(list.lastOrNull?.date) }",
+                                  "${ topic.currentStreak(lastDay) }",
                                   style: TextStyle(
                                     fontSize: 56,
                                     fontWeight: FontWeight.bold,
@@ -340,9 +338,9 @@ class HomeView extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          _buildRankColumn(context, "2th", "3 Days", "🥈"),
-                          _buildRankColumn(context, "1st", "5 Days", "🥇"),
-                          _buildRankColumn(context, "3th", "2 Days", "🥉"),
+                          _buildRankColumn(context, "2th", "${listSortedStreak.length > 1 ? listSortedStreak[1].streak : 0} Days", "🥈"),
+                          _buildRankColumn(context, "1st", "${listSortedStreak.firstOrNull?.streak??0} Days", "🥇"),
+                          _buildRankColumn(context, "3th", "${listSortedStreak.length > 2 ? listSortedStreak[2].streak : 0} Days", "🥉"),
                         ],
                       ),
                     ),
@@ -400,7 +398,7 @@ class HomeView extends StatelessWidget {
                           ),
                           12.space,
                           TextCustom(
-                            'Habit History',
+                            '${topic.title} History',
                             fontSize: 18,
                             bold: true,
                             color: Theme.of(context).colorScheme.onPrimary,
