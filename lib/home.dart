@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:habits/Auth/login_view.dart';
 import 'package:habits/dialogs/delete_topic.dart';
+import 'package:habits/dialogs/profile.dart';
 import 'package:habits/home_view_new.dart';
 import 'package:habits/model/topic_model.dart';
 import 'dialogs/add_topic.dart';
@@ -24,6 +25,37 @@ class Home extends StatelessWidget {
           ),
         ),
         backgroundColor: Theme.of(context).primaryColor,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => Profile.show(context),
+                borderRadius: BorderRadius.circular(20),
+                splashColor: Colors.white.withOpacity(0.3),
+                highlightColor: Colors.white.withOpacity(0.1),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withOpacity(0.1),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.person,
+                    size: 24,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => AddTopic.show(context, null),

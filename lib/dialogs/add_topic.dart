@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:habits/extension/on_num.dart';
 import 'package:habits/firebase/firebase.dart';
@@ -210,6 +211,8 @@ class _AddTopicState extends State<AddTopic> {
                                       target: targetController.text.isEmpty
                                           ? 0
                                           : int.parse(targetController.text),
+                                      createdAt: widget.topicModel?.createdAt ?? Timestamp.now().toDate(),
+
                                     )
                                   );
                                 Navigator.pop(context);

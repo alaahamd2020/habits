@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:habits/Auth/auth_firebase.dart';
-import 'package:habits/Auth/register.dart';
+import 'package:habits/Auth/login_view.dart';
 import 'package:habits/Auth/switcher.dart';
 import 'package:habits/extension/on_num.dart';
 import 'package:habits/firebase/auth.dart';
 import 'package:habits/widgets/custom_text.dart';
 
-class LoginView extends StatefulWidget {
-  const LoginView({super.key});
+class Register extends StatefulWidget {
+  const Register({Key? key}) : super(key: key);
 
   @override
-  State<LoginView> createState() => _LoginViewState();
+  State<Register> createState() => _RegisterState();
 }
 
-class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
+class _RegisterState extends State<Register> with TickerProviderStateMixin {
+  final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
   bool _isLoading = false;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -45,9 +47,29 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
   @override
   void dispose() {
     _animationController.dispose();
+    nameController.dispose();
     emailController.dispose();
     passwordController.dispose();
+    confirmPasswordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleRegister() async {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+      HapticFeedback.lightImpact();
+
+      // Simulate API call
+      await FBAuth.createUserWithEmailAndPassword(emailController.text, passwordController.text, nameController.text);
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      // Handle registration logic here
+    }
   }
 
   @override
@@ -119,7 +141,7 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                   ],
                                 ),
                                 child: const Icon(
-                                  Icons.person,
+                                  Icons.person_add,
                                   color: Colors.white,
                                   size: 40,
                                 ),
@@ -128,18 +150,74 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
 
                               // Welcome Text
                               TextCustom(
-                                'Welcome Back!',
+                                'Create Account',
                                 fontSize: 28,
                                 bold: true,
                                 color: Theme.of(context).textTheme.headlineLarge?.color ?? Colors.black,
                               ),
                               8.space,
                               TextCustom(
-                                'Sign in to continue',
+                                'Sign up to get started',
                                 fontSize: 16,
                                 color: Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.6) ?? Colors.grey,
                               ),
                               32.space,
+
+                              // Name Field
+                              Container(
+                                decoration: BoxDecoration(
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Theme.of(context).shadowColor.withOpacity(0.1),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 5),
+                                    ),
+                                  ],
+                                ),
+                                child: TextFormField(
+                                  controller: nameController,
+                                  keyboardType: TextInputType.name,
+                                  decoration: InputDecoration(
+                                    prefixIcon: Icon(
+                                      Icons.person_outline,
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                    labelText: 'Full Name',
+                                    hintText: 'Enter your full name',
+                                    filled: true,
+                                    fillColor: Theme.of(context).inputDecorationTheme.fillColor ??
+                                        Theme.of(context).cardColor,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(15),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(15),
+                                      borderSide: BorderSide(
+                                        color: Theme.of(context).dividerColor,
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(15),
+                                      borderSide: BorderSide(
+                                        color: Theme.of(context).primaryColor,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    labelStyle: TextStyle(color: Theme.of(context).primaryColor),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please enter your full name';
+                                    }
+                                    if (value.length < 2) {
+                                      return 'Name must be at least 2 characters';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+                              20.space,
 
                               // Email Field
                               Container(
@@ -262,27 +340,76 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                   },
                                 ),
                               ),
-                              12.space,
+                              20.space,
 
-                              // Forgot Password
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: TextButton(
-                                  onPressed: () {
-                                    // Handle forgot password
-                                  },
-                                  child: Text(
-                                    'Forgot Password?',
-                                    style: TextStyle(
-                                      color: Theme.of(context).primaryColor,
-                                      fontWeight: FontWeight.w500,
+                              // Confirm Password Field
+                              Container(
+                                decoration: BoxDecoration(
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Theme.of(context).shadowColor.withOpacity(0.1),
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 5),
                                     ),
+                                  ],
+                                ),
+                                child: TextFormField(
+                                  controller: confirmPasswordController,
+                                  obscureText: !_isConfirmPasswordVisible,
+                                  decoration: InputDecoration(
+                                    prefixIcon: Icon(
+                                      Icons.lock_outline,
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _isConfirmPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                                        color: Theme.of(context).primaryColor,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                                        });
+                                      },
+                                    ),
+                                    labelText: 'Confirm Password',
+                                    hintText: 'Re-enter your password',
+                                    filled: true,
+                                    fillColor: Theme.of(context).inputDecorationTheme.fillColor ??
+                                        Theme.of(context).cardColor,
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(15),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(15),
+                                      borderSide: BorderSide(
+                                        color: Theme.of(context).dividerColor,
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(15),
+                                      borderSide: BorderSide(
+                                        color: Theme.of(context).primaryColor,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    labelStyle: TextStyle(color: Theme.of(context).primaryColor),
                                   ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please confirm your password';
+                                    }
+                                    if (value != passwordController.text) {
+                                      return 'Passwords do not match';
+                                    }
+                                    return null;
+                                  },
                                 ),
                               ),
-                              24.space,
+                              32.space,
 
-                              // Login Button
+                              // Register Button
                               Container(
                                 width: double.infinity,
                                 height: 55,
@@ -310,7 +437,7 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                       borderRadius: BorderRadius.circular(15),
                                     ),
                                   ),
-                                  onPressed: _isLoading ? null : _handleLogin,
+                                  onPressed: _isLoading ? null : _handleRegister,
                                   child: _isLoading
                                       ? const SizedBox(
                                     width: 20,
@@ -321,7 +448,7 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                     ),
                                   )
                                       : const Text(
-                                    'Login',
+                                    'Create Account',
                                     style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 16,
@@ -351,7 +478,7 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                               ),
                               24.space,
 
-                              // Sign Up Button
+                              // Login Button
                               Container(
                                 width: double.infinity,
                                 height: 55,
@@ -364,10 +491,10 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
                                 ),
                                 child: TextButton(
                                   onPressed: () {
-                                    Switcher.isLogin.value = false;
+                                    Switcher.isLogin.value = true;
                                   },
                                   child: Text(
-                                    'Create New Account',
+                                    'Already have an account? Sign In',
                                     style: TextStyle(
                                       color: Theme.of(context).primaryColor,
                                       fontSize: 16,
@@ -390,44 +517,5 @@ class _LoginViewState extends State<LoginView> with TickerProviderStateMixin {
         ),
       ),
     );
-  }
-
-  Widget _buildSocialButton({
-    required IconData icon,
-    required Color color,
-    required VoidCallback onPressed,
-  }) {
-    return Container(
-      width: 50,
-      height: 50,
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Theme.of(context).dividerColor),
-      ),
-      child: IconButton(
-        icon: Icon(icon, color: color, size: 24),
-        onPressed: onPressed,
-      ),
-    );
-  }
-
-  void _handleLogin() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
-
-      // Add haptic feedback
-      HapticFeedback.lightImpact();
-
-      // Simulate login process
-      await FBAuth.signInWithEmailAndPassword( emailController.text, passwordController.text);
-
-      setState(() {
-        _isLoading = false;
-      });
-
-    }
   }
 }

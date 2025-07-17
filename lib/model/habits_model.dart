@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:habits/extension/on_date_time.dart';
+import 'package:habits/firebase/auth.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'habits_model.g.dart';
@@ -12,7 +13,7 @@ class HabitsModel {
   @JsonKey(name: 'created_at')
   DateTime createdAt = Timestamp.now().toDate();
 
-  String userId = '3XkMSppPiUbDU2fyjme0';
+  String userId = FBAuth.user!.id!;
   String topicId;
 
   HabitsModel(this.id, this.times, this.streak, this.date, this.topicId);
@@ -32,6 +33,16 @@ class HabitsModel {
   int toNextStreak(DateTime next) => next.difference(date.toDate()).inDays;
 
   toJson() => _$HabitsModelToJson(this);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is HabitsModel &&
+          runtimeType == other.runtimeType &&
+          date.withoutTime == other.date.withoutTime;
+
+  @override
+  int get hashCode => date.hashCode;
 }
 
 class MyConverter implements JsonConverter<Timestamp, dynamic> {
@@ -67,7 +78,7 @@ extension HabitsList on Iterable<HabitsModel> {
     final int length = this
         .where((element) => (element.date.toDate() != startDay.withoutTime) &&
                 (element.date.toDate() != endDay.withoutTime),)
-        .uniqueDates
+        .toSet()
         .length;
     print('length $length');
 

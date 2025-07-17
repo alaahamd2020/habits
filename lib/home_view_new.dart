@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:habits/dialogs/add_habit.dart';
+import 'package:habits/dialogs/profile.dart';
 import 'package:habits/extension/on_num.dart';
 import 'package:habits/firebase/firebase.dart';
 import 'package:habits/history_new.dart';
@@ -14,7 +15,6 @@ class HomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: TextCustom(
@@ -24,7 +24,37 @@ class HomeView extends StatelessWidget {
           color: Theme.of(context).colorScheme.onPrimary,
         ),
         backgroundColor: Theme.of(context).primaryColor,
-        // backgroundColor: ,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => Profile.show(context),
+                borderRadius: BorderRadius.circular(20),
+                splashColor: Colors.white.withOpacity(0.3),
+                highlightColor: Colors.white.withOpacity(0.1),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withOpacity(0.1),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.3),
+                      width: 1,
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.person,
+                    size: 24,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => AddHabit.show(context, topic),
@@ -45,7 +75,7 @@ class HomeView extends StatelessWidget {
           width: MediaQuery.sizeOf(context).width,
           padding: const EdgeInsets.all(16),
           child: StreamBuilder(
-            stream: FB.allHabits(topic.userId, topic.id!),
+            stream: FB.allHabits(topic.id!),
             builder: (context, asyncSnapshot) {
               final list = asyncSnapshot.data ?? [];
               DateTime lastDay = list.lastOrNull?.date.toDate() ?? topic.createdAt;

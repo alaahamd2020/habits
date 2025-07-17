@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:habits/dialogs/delete_habit.dart';
 import 'package:habits/extension/on_num.dart';
-import 'package:habits/fire_store_habits.dart';
 import 'package:habits/firebase/firebase.dart';
 import 'package:habits/model/habits_model.dart';
 import 'package:habits/widgets/custom_text.dart';
 import 'package:intl/intl.dart';
-
 import 'model/topic_model.dart';
 
 class History extends StatelessWidget {
@@ -18,9 +15,8 @@ class History extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: StreamBuilder(
-        stream: FB.allHabits(topicModel.userId, topicModel.id!),
+        stream: FB.allHabits(topicModel.id!),
         builder: (context,snapshot) {
-
           final list = snapshot.data ?? [];
           return
           Container(
@@ -220,6 +216,7 @@ class History extends StatelessWidget {
                               ),) :
                               ListView.separated(
                                 shrinkWrap: true,
+                                reverse: true,
                                 physics: const NeverScrollableScrollPhysics(),
                                 itemCount: list.length, // Sample data
                                 separatorBuilder: (context, index) => Divider(

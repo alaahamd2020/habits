@@ -24,18 +24,22 @@ class AddHabit extends StatefulWidget {
 }
 
 class _AddHabitState extends State<AddHabit> {
-  DateTime _dateTime = Timestamp.now().toDate();
+  DateTime _dateTime = DateTime.now();
 
   int _count = 1;
-  
+  int _streak = 0;
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: FB.allHabits(widget.topicModel.userId, widget.topicModel.id!),
+      stream: FB.allHabits( widget.topicModel.id!),
       builder: (context, asyncSnapshot) {
         final list = asyncSnapshot.data ?? [];
         DateTime lastDay = list.lastOrNull?.date.toDate() ?? widget.topicModel.createdAt;
+        final canAdd = _dateTime.withoutTime.isBefore(DateTime.now().withoutTime);
+        final canSubtract = _dateTime.withoutTime.isAfter(lastDay);
+        final canSubmit = _dateTime.subtract(Duration(days: 1)).withoutTime.isBefore(DateTime.now().withoutTime) &&  _dateTime.add(Duration(days: 1)).withoutTime.isAfter(lastDay);
+        final canCount =  _count == 1;
         return BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Dialog(
@@ -56,6 +60,7 @@ class _AddHabitState extends State<AddHabit> {
                     ).colorScheme.surfaceVariant.withOpacity(0.8),
                   ],
                 ),
+                
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
@@ -168,31 +173,31 @@ class _AddHabitState extends State<AddHabit> {
                           Container(
                             margin: const EdgeInsets.symmetric(horizontal: 16),
                             decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.surface,
+                              color:  Theme.of(context).colorScheme.surface,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Row(
                               children: [
                                 // Previous Day Button
                                 IconButton(
-                                  onPressed: () {
+                                  onPressed: canSubtract ? () {
                                     setState(() {
-                                      _dateTime = _dateTime.subtract(
-                                        Duration(days: 1),
-                                      );
+                                        _dateTime = _dateTime.subtract(
+                                            Duration(days: 1));
+                                        updateStreak(lastDay);
                                     });
-                                  },
+                                  }:null,
                                   icon: Container(
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: Theme.of(
+                                      color: !canSubtract ? Colors.grey.shade200 : Theme.of(
                                         context,
                                       ).colorScheme.primary.withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Icon(
                                       Icons.chevron_left_rounded,
-                                      color: Theme.of(
+                                      color:!canSubtract ? Colors.grey.shade500: Theme.of(
                                         context,
                                       ).colorScheme.primary,
                                       size: 24,
@@ -204,7 +209,7 @@ class _AddHabitState extends State<AddHabit> {
                                 Expanded(
                                   child: GestureDetector(
                                     onTap: () async {
-                                      final newDate = await addDate();
+                                      final newDate = await addDate(lastDay);
                                       setState(() {
                                         _dateTime = newDate ?? _dateTime;
                                       });
@@ -251,24 +256,25 @@ class _AddHabitState extends State<AddHabit> {
 
                                 // Next Day Button
                                 IconButton(
-                                  onPressed: () {
+                                  onPressed: canAdd?() {
                                     setState(() {
                                       _dateTime = _dateTime.add(
                                         Duration(days: 1),
                                       );
+                                      updateStreak(lastDay);
                                     });
-                                  },
+                                  }:null,
                                   icon: Container(
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: Theme.of(
+                                      color: !canAdd ? Colors.grey.shade200 : Theme.of(
                                         context,
                                       ).colorScheme.primary.withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Icon(
                                       Icons.chevron_right_rounded,
-                                      color: Theme.of(
+                                      color:  !canAdd ? Colors.grey.shade500 : Theme.of(
                                         context,
                                       ).colorScheme.primary,
                                       size: 24,
@@ -284,6 +290,7 @@ class _AddHabitState extends State<AddHabit> {
                     ),
 
                     const SizedBox(height: 16),
+                    TextCustom('$_streak'),
                     // Count Selection Section
                     Container(
                       decoration: BoxDecoration(
@@ -332,22 +339,22 @@ class _AddHabitState extends State<AddHabit> {
                               children: [
                                 // Decrease Button
                                 IconButton(
-                                  onPressed: () {
+                                  onPressed: !canCount ? () {
                                     setState(() {
-                                      _count == 1 ? _count : _count--;
+                                     _count--;
                                     });
-                                  },
+                                  } : null,
                                   icon: Container(
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: Theme.of(
+                                      color: canCount ? Colors.grey.shade200 : Theme.of(
                                         context,
                                       ).colorScheme.error.withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Icon(
                                       Icons.remove_rounded,
-                                      color: Theme.of(
+                                      color: canCount ? Colors.grey.shade500 : Theme.of(
                                         context,
                                       ).colorScheme.error,
                                       size: 24,
@@ -487,23 +494,24 @@ class _AddHabitState extends State<AddHabit> {
                               ],
                             ),
                             child: TextButton(
-                              onPressed: () {
+                              onPressed: canSubmit ? ()  {
+                                final HabitsModel newData = HabitsModel(
+                                  '',
+                                  _count,
+                                  widget.topicModel.currentStreakAdd(lastDay, _dateTime),
+                                  _dateTime.toTimestamp,
+                                  widget.topicModel.id!,
+                                );
                                 FB.addHabit(
-                                  HabitsModel(
-                                    '',
-                                    _count,
-                                    widget.topicModel.currentStreak(lastDay),
-                                    _dateTime.toTimestamp,
-                                    widget.topicModel.id!,
-                                  ),
+                                  newData,
                                 );
                                 Navigator.pop(context);
-                              },
+                              } : null,
                               style: TextButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 16,
                                 ),
-                                backgroundColor: Colors.transparent,
+                                backgroundColor: canSubmit ? Colors.transparent : Colors.grey,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -540,15 +548,19 @@ class _AddHabitState extends State<AddHabit> {
             ),
           ),
         );
+
       },
+
     );
   }
 
-  Future<DateTime?> addDate() {
+
+
+  Future<DateTime?> addDate(DateTime lastDay) {
     return showDatePicker(
       context: context,
-      firstDate: DateTime.now().subtract(Duration(days: 30)),
-      lastDate: DateTime.now(),
+      firstDate: lastDay,
+      lastDate: Timestamp.now().toDate(),
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
@@ -562,4 +574,13 @@ class _AddHabitState extends State<AddHabit> {
       },
     );
   }
+
+  void updateStreak(DateTime lastDay) {
+    setState(() {
+      _streak = widget.topicModel.currentStreakAdd(lastDay, _dateTime);
+    });
+  }
+
 }
+
+

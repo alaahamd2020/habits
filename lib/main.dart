@@ -1,10 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:habits/binding.dart';
+import 'package:habits/Auth/switcher.dart';
 import 'package:habits/firebase_options.dart';
-import 'package:habits/home.dart';
-import 'package:habits/home_view.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
@@ -23,12 +21,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Habits',
       theme: ThemeData(
         colorScheme: theme.copyWith(
         ),
       ),
-      home: const Home(),
+      home: const Switcher(),
     );
   }
 }
