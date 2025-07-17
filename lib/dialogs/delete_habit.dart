@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:habits/fire_store_habits.dart';
+import 'package:habits/commit/fire_store_habits.dart';
 import 'package:habits/firebase/firebase.dart';
 import 'package:habits/model/habits_model.dart';
 import 'package:habits/widgets/custom_text.dart';
