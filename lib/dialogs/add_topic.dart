@@ -1,9 +1,11 @@
 import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:habits/extension/on_date_time.dart';
 import 'package:habits/extension/on_num.dart';
 import 'package:habits/firebase/firebase.dart';
 import 'package:habits/model/topic_model.dart';
+import 'package:intl/intl.dart';
 import '../widgets/custom_text.dart';
 
 class AddTopic extends StatefulWidget {
@@ -25,13 +27,16 @@ class AddTopic extends StatefulWidget {
 
 class _AddTopicState extends State<AddTopic> {
 
-
-
+  DateTime _dateTime = DateTime.now();
   @override
   Widget build(BuildContext context) {
     final titleController = TextEditingController(text: widget.topicModel?.title);
     final descriptionController = TextEditingController(text: widget.topicModel?.description);
     final targetController = TextEditingController(text: widget.topicModel?.target.toString());
+
+    final canAdd = _dateTime.withoutTime.isBefore(DateTime.now().withoutTime);
+
+
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
       child: Dialog(
@@ -155,6 +160,162 @@ class _AddTopicState extends State<AddTopic> {
                   ),
                   const SizedBox(height: 18),
 
+                  Visibility(
+                    visible: widget.topicModel?.id == null,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primaryContainer.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.outline.withOpacity(0.2),
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.calendar_today_rounded,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 8),
+                                TextCustom(
+                                  'Select Date Starting from',
+                                  fontSize: 16,
+                                  bold: true,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 16),
+                            decoration: BoxDecoration(
+                              color:  Theme.of(context).colorScheme.surface,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              children: [
+                                // Previous Day Button
+                                IconButton(
+                                  onPressed:() {
+                                    setState(() {
+                                      _dateTime = _dateTime.subtract(
+                                          Duration(days: 1));
+                                    });
+                                  },
+                                  icon: Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Icon(
+                                      Icons.chevron_left_rounded,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
+                                      size: 24,
+                                    ),
+                                  ),
+                                ),
+
+                                // Date Display
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      final newDate = await addDate();
+                                      setState(() {
+                                        _dateTime = newDate ?? _dateTime;
+                                      });
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 12,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primaryContainer
+                                            .withOpacity(0.5),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          TextCustom(
+                                            DateFormat.EEEE(
+                                              'ar',
+                                            ).format(_dateTime),
+                                            alignment: TextAlign.center,
+                                            fontSize: 16,
+                                            bold: true,
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.onPrimaryContainer,
+                                          ),
+                                          const SizedBox(height: 4),
+                                          TextCustom(
+                                            DateFormat('M/d').format(_dateTime),
+                                            alignment: TextAlign.center,
+                                            fontSize: 14,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onPrimaryContainer
+                                                .withOpacity(0.8),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                                // Next Day Button
+                                IconButton(
+                                  onPressed: canAdd?() {
+                                    setState(() {
+                                      _dateTime = _dateTime.add(
+                                        Duration(days: 1),
+                                      );
+                                    });
+                                  }:null,
+                                  icon: Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      color: !canAdd ? Colors.grey.shade200 : Theme.of(
+                                        context,
+                                      ).colorScheme.primary.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Icon(
+                                      Icons.chevron_right_rounded,
+                                      color:  !canAdd ? Colors.grey.shade500 : Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
+                                      size: 24,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+
                   // Buttons
                   Row(
                     children: [
@@ -211,7 +372,7 @@ class _AddTopicState extends State<AddTopic> {
                                       target: targetController.text.isEmpty
                                           ? 0
                                           : int.parse(targetController.text),
-                                      createdAt: widget.topicModel?.createdAt ?? Timestamp.now().toDate(),
+                                      createdAt: widget.topicModel?.createdAt ?? _dateTime,
 
                                     )
                                   );
@@ -334,6 +495,24 @@ class _AddTopicState extends State<AddTopic> {
           const SizedBox(height: 12),
         ],
       ),
+    );
+  }
+  Future<DateTime?> addDate() {
+    return showDatePicker(
+      context: context,
+      firstDate: DateTime.now().subtract(const Duration(days: 30)),
+      lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+              primary: Theme.of(context).colorScheme.primary,
+              surface: Theme.of(context).colorScheme.surface,
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
   }
 }

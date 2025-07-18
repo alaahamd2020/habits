@@ -30,6 +30,9 @@ class HabitsModel {
   bool get isThisMonth =>
       date.toDate().isAfter(DateTime.now().subtract(Duration(days: 30)));
 
+  bool get isThis3Months =>
+      date.toDate().isAfter(DateTime.now().subtract(Duration(days: 90)));
+
   int toNextStreak(DateTime next) => next.difference(date.toDate()).inDays;
 
   toJson() => _$HabitsModelToJson(this);

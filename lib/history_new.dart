@@ -225,7 +225,7 @@ class History extends StatelessWidget {
                                 ),
                                 itemBuilder: (context, index) => _buildHistoryItem(
                                   context,list[index],
-                                  index +1
+                                  list.length - index
                                 ),
                               ),
                             ],
