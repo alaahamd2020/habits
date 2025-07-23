@@ -11,6 +11,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   initializeDateFormatting('ar' );
+  // await setupFlutterNotifications();
   runApp(const MyApp());
 }
 

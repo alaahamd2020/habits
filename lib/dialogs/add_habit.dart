@@ -27,7 +27,6 @@ class _AddHabitState extends State<AddHabit> {
   DateTime _dateTime = DateTime.now();
 
   int _count = 1;
-  int _streak = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -184,7 +183,6 @@ class _AddHabitState extends State<AddHabit> {
                                     setState(() {
                                         _dateTime = _dateTime.subtract(
                                             Duration(days: 1));
-                                        updateStreak(lastDay);
                                     });
                                   }:null,
                                   icon: Container(
@@ -261,7 +259,6 @@ class _AddHabitState extends State<AddHabit> {
                                       _dateTime = _dateTime.add(
                                         Duration(days: 1),
                                       );
-                                      updateStreak(lastDay);
                                     });
                                   }:null,
                                   icon: Container(
@@ -290,7 +287,6 @@ class _AddHabitState extends State<AddHabit> {
                     ),
 
                     const SizedBox(height: 16),
-                    TextCustom('$_streak'),
                     // Count Selection Section
                     Container(
                       decoration: BoxDecoration(
@@ -573,12 +569,6 @@ class _AddHabitState extends State<AddHabit> {
         );
       },
     );
-  }
-
-  void updateStreak(DateTime lastDay) {
-    setState(() {
-      _streak = widget.topicModel.currentStreakAdd(lastDay, _dateTime);
-    });
   }
 
 }
