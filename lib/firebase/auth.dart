@@ -38,7 +38,12 @@ class FBAuth {
       await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
-      );
+      ).then((value) {
+        Get.snackbar('تم تسجيل الدخول بنجاح', 'نورت البرنامج يا قلبي  ',
+            backgroundColor: Colors.green.shade100,
+            icon: Icon(Icons.done, color: Colors.green.shade700,));
+      });
+
     } on FirebaseAuthException catch (e) {
       if (e.code == 'invalid-credential') {
         Get.snackbar('Warning', 'Wrong email or password.',

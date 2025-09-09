@@ -29,6 +29,7 @@ class FB {
     final index = list.indexOf(model);
     final oldItem = index != -1 ? list[index] : null;
     model.times += oldItem?.times ?? 0;
+    model.streak += oldItem?.streak ?? 0;
 
     final doc = _habitsDataReference( model.topicId).doc(oldItem?.id);
     if(model.id.isEmpty) model.id = doc.id;
@@ -48,7 +49,7 @@ class FB {
     return _topicsReference().snapshots().map((event) {
       return event.docs
           .map((e) => TopicModel.fromJson(e.data() as Map<String, dynamic>))
-          .toList();
+          .toList()..sort((a, b) => a.createdAt.compareTo(b.createdAt));
     });
   }
 

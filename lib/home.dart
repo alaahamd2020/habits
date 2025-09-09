@@ -15,14 +15,11 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: GestureDetector(
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context)=>LoginView())),
-          child: TextCustom(
-            'Topics',
-            fontSize: 25,
-            bold: true,
-            color: Theme.of(context).colorScheme.onPrimary,
-          ),
+        title: TextCustom(
+          'Topics',
+          fontSize: 25,
+          bold: true,
+          color: Theme.of(context).colorScheme.onPrimary,
         ),
         backgroundColor: Theme.of(context).primaryColor,
         actions: [
