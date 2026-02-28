@@ -71,5 +71,7 @@
     "track_your_journey": "تتبع رحلتك",
     "change_password": "تغيير كلمة السر",
     "new_password": "كلمة السر الجديدة",
-    "password_changed_successfully": "تم تغيير كلمة السر بنجاح"
+    "password_changed_successfully": "تم تغيير كلمة السر بنجاح",
+    "no_habits_yet": "لم تقم بإضافة أي عادة بعد، ابدأ الآن عبر الضغط على زر الإضافة!",
+    "no_history_yet": "لا يوجد سجل لهذه العادة بعد، ابدأ بتسجيل إنجازك اليوم!"
 }

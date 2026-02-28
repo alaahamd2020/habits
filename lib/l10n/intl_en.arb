@@ -71,5 +71,7 @@
     "track_your_journey": "Track your journey",
     "change_password": "Change Password",
     "new_password": "New Password",
-    "password_changed_successfully": "Password Changed Successfully"
+    "password_changed_successfully": "Password Changed Successfully",
+    "no_habits_yet": "No habits added yet. Start now by tapping the add button!",
+    "no_history_yet": "No history for this habit yet. Start tracking your progress today!"
 }

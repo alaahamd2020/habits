@@ -71,8 +71,36 @@ class Home extends StatelessWidget {
 
           final topics = snapshot.data ?? [];
 
+          if (topics.isEmpty) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.assignment_add,
+                      size: 100,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.primary.withOpacity(0.3),
+                    ),
+                    const SizedBox(height: 24),
+                    TextCustom(
+                      S.of(context).no_habits_yet,
+                      fontSize: 18,
+                      alignment: TextAlign.center,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      bold: true,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+
           return ListView.builder(
-            itemCount: snapshot.data!.length,
+            itemCount: topics.length,
             itemBuilder: (context, index) {
               final topic = topics[index];
               return Card(

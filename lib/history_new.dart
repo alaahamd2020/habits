@@ -248,6 +248,39 @@ class History extends StatelessWidget {
                                         ),
                                       ),
                                     )
+                                  : list.isEmpty
+                                  ? Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 48.0,
+                                          horizontal: 24.0,
+                                        ),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              Icons.history_toggle_off,
+                                              size: 80,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary
+                                                  .withOpacity(0.3),
+                                            ),
+                                            const SizedBox(height: 20),
+                                            TextCustom(
+                                              S.of(context).no_history_yet,
+                                              fontSize: 16,
+                                              alignment: TextAlign.center,
+                                              color: Theme.of(
+                                                context,
+                                              ).colorScheme.onSurfaceVariant,
+                                              bold: true,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    )
                                   : ListView.separated(
                                       shrinkWrap: true,
                                       reverse: true,
