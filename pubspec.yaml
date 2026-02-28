@@ -42,6 +42,9 @@ dependencies:
   firebase_auth: ^5.6.2
   firebase_messaging: ^15.2.9
 
+#  temp
+  excel: ^4.0.6
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -102,3 +105,5 @@ assets:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+flutter_intl:
+  enabled: true
