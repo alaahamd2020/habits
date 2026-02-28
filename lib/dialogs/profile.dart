@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:habits/firebase/auth.dart';
 import 'package:habits/widgets/custom_text.dart';
+import 'package:habits/generated/l10n.dart';
+import 'package:get/get.dart';
+import 'package:habits/services/storage_service.dart';
 
 class Profile extends StatefulWidget {
   const Profile({Key? key}) : super(key: key);
 
   static show(BuildContext context) {
     showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (context) {
-          return Profile();
-        });
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return Profile();
+      },
+    );
   }
 
   @override
@@ -49,12 +53,12 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Sign Out'),
-        content: const Text('Are you sure you want to sign out?'),
+        title: Text(S.of(context).sign_out),
+        content: Text(S.of(context).sign_out_confirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(S.of(context).cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -66,9 +70,195 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
               backgroundColor: Theme.of(context).colorScheme.error,
               foregroundColor: Theme.of(context).colorScheme.onError,
             ),
-            child: const Text('Sign Out'),
+            child: Text(S.of(context).sign_out),
           ),
         ],
+      ),
+    );
+  }
+
+  void _handleLanguageSwitch() {
+    final newLocale = Get.locale?.languageCode == 'en'
+        ? const Locale('ar')
+        : const Locale('en');
+    Get.updateLocale(newLocale);
+    StorageService.setLanguageCode(newLocale.languageCode);
+    S.load(newLocale);
+    setState(() {});
+  }
+
+  void _showEditNameDialog(String currentName) {
+    final TextEditingController nameController = TextEditingController(
+      text: currentName,
+    );
+    final _formKey = GlobalKey<FormState>();
+
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextCustom(S.of(context).name, fontSize: 20, bold: true),
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    controller: nameController,
+                    decoration: InputDecoration(
+                      labelText: S.of(context).name,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return S.of(context).please_enter_your_name;
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextButton(
+                          onPressed: () => Get.back(),
+                          child: Text(S.of(context).cancel),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            if (_formKey.currentState!.validate()) {
+                              try {
+                                await FBAuth.updateDisplayName(
+                                  nameController.text.trim(),
+                                );
+                                Get.back();
+                              } catch (e) {
+                                // Error handled in FBAuth
+                              }
+                            }
+                          },
+                          child: Text(S.of(context).save),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showChangePasswordDialog() {
+    final TextEditingController newPasswordController = TextEditingController();
+    final TextEditingController confirmPasswordController =
+        TextEditingController();
+    final _formKey = GlobalKey<FormState>();
+
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextCustom(
+                    S.of(context).change_password,
+                    fontSize: 20,
+                    bold: true,
+                  ),
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    controller: newPasswordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      labelText: S.of(context).new_password,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return S.of(context).please_enter_your_password;
+                      }
+                      if (value.length < 6) {
+                        return S
+                            .of(context)
+                            .password_must_be_at_least_6_characters;
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: confirmPasswordController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      labelText: S.of(context).confirm_password,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value != newPasswordController.text) {
+                        return S.of(context).passwords_do_not_match;
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextButton(
+                          onPressed: () => Get.back(),
+                          child: Text(S.of(context).cancel),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            if (_formKey.currentState!.validate()) {
+                              try {
+                                await FBAuth.updatePassword(
+                                  newPasswordController.text,
+                                );
+                                Get.back();
+                                Get.snackbar(
+                                  S.of(context).password_changed_successfully,
+                                  '',
+                                  backgroundColor: Colors.green.shade100,
+                                );
+                              } catch (e) {
+                                // Error handled in FBAuth
+                              }
+                            }
+                          },
+                          child: Text(S.of(context).save),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -81,28 +271,29 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-        stream: FBAuth.userStream,
-        builder: (context, snapshot) {
-          final user = FBAuth.user;
-          final email = user?.email ?? 'Unknown';
-          final name = user?.name ?? 'Unknown';
-          final initials = _getInitials(email);
+      stream: FBAuth.userStream,
+      builder: (context, snapshot) {
+        final user = FBAuth.user;
+        final email = user?.email ?? 'Unknown';
+        final name = user?.name ?? 'Unknown';
+        final initials = _getInitials(email);
 
-          return AnimatedBuilder(
-            animation: _animationController,
-            builder: (context, child) {
-              return Transform.scale(
-                scale: _scaleAnimation.value,
-                child: Opacity(
-                  opacity: _opacityAnimation.value,
-                  child: Dialog(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 8,
-                    child: Container(
-                      width: 320,
-                      padding: const EdgeInsets.all(24),
+        return AnimatedBuilder(
+          animation: _animationController,
+          builder: (context, child) {
+            return Transform.scale(
+              scale: _scaleAnimation.value,
+              child: Opacity(
+                opacity: _opacityAnimation.value,
+                child: Dialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  elevation: 8,
+                  child: Container(
+                    width: 320,
+                    padding: const EdgeInsets.all(24),
+                    child: SingleChildScrollView(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisSize: MainAxisSize.min,
@@ -115,7 +306,9 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                                 onPressed: () => Navigator.pop(context),
                                 icon: Icon(
                                   Icons.close,
-                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
                                 ),
                                 splashRadius: 20,
                               ),
@@ -141,7 +334,9 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                               child: Text(
                                 initials,
                                 style: TextStyle(
-                                  color: Theme.of(context).colorScheme.onPrimary,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimary,
                                   fontSize: 32,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -152,8 +347,8 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                           const SizedBox(height: 16),
 
                           // Profile Title
-                          const TextCustom(
-                            'Profile',
+                          TextCustom(
+                            S.of(context).profile,
                             fontSize: 24,
                             bold: true,
                           ),
@@ -168,30 +363,51 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                               vertical: 12,
                             ),
                             decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.surfaceVariant,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.surfaceContainerHighest,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Name',
+                                  S.of(context).name,
                                   style: TextStyle(
-                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
-                                TextCustom(
-                                  name,
-                                  fontSize: 16,
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextCustom(name, fontSize: 16),
+                                    ),
+                                    IconButton(
+                                      onPressed: () =>
+                                          _showEditNameDialog(name),
+                                      icon: Icon(
+                                        Icons.edit_outlined,
+                                        size: 18,
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.primary,
+                                      ),
+                                      splashRadius: 20,
+                                      visualDensity: VisualDensity.compact,
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
                           ),
 
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 16),
+
                           // Email
                           Container(
                             width: double.infinity,
@@ -200,41 +416,92 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                               vertical: 12,
                             ),
                             decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.surfaceVariant,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.surfaceContainerHighest,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Email',
+                                  S.of(context).email,
                                   style: TextStyle(
-                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
                                 const SizedBox(height: 4),
-                                TextCustom(
-                                  email,
-                                  fontSize: 16,
-                                ),
+                                TextCustom(email, fontSize: 16),
                               ],
                             ),
                           ),
 
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 16),
 
-                          // Account Settings Section
+                          // Language Settings Section
                           Container(
                             width: double.infinity,
                             decoration: BoxDecoration(
                               border: Border.all(
-                                color: Theme.of(context).colorScheme.outline.withOpacity(0.2),
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.outline.withOpacity(0.2),
                               ),
                               borderRadius: BorderRadius.circular(12),
                             ),
+                            child: ListTile(
+                              leading: Icon(
+                                Icons.language,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                              title: TextCustom(
+                                S.of(context).language,
+                                fontSize: 16,
+                              ),
+                              trailing: Switch(
+                                value: Get.locale?.languageCode == 'ar',
+                                onChanged: (value) => _handleLanguageSwitch(),
+                                activeColor: Theme.of(
+                                  context,
+                                ).colorScheme.primary,
+                              ),
+                            ),
+                          ),
 
+                          const SizedBox(height: 16),
+
+                          // Change Password Button
+                          Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.outline.withOpacity(0.2),
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: ListTile(
+                              leading: Icon(
+                                Icons.lock_outline,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                              title: TextCustom(
+                                S.of(context).change_password,
+                                fontSize: 16,
+                              ),
+                              onTap: _showChangePasswordDialog,
+                              trailing: Icon(
+                                Icons.chevron_right,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
+                              ),
+                            ),
                           ),
 
                           const SizedBox(height: 24),
@@ -245,11 +512,17 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                             child: ElevatedButton.icon(
                               onPressed: _handleSignOut,
                               icon: const Icon(Icons.logout),
-                              label: const Text('Sign Out'),
+                              label: Text(S.of(context).sign_out),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Theme.of(context).colorScheme.error,
-                                foregroundColor: Theme.of(context).colorScheme.onError,
-                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                backgroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.error,
+                                foregroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.onError,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -261,9 +534,11 @@ class _ProfileState extends State<Profile> with SingleTickerProviderStateMixin {
                     ),
                   ),
                 ),
-              );
-            },
-          );
-        });
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 }

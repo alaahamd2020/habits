@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:habits/Auth/login_view.dart';
 import 'package:habits/dialogs/delete_topic.dart';
 import 'package:habits/dialogs/profile.dart';
 import 'package:habits/home_view_new.dart';
 import 'package:habits/model/topic_model.dart';
+import 'package:habits/generated/l10n.dart';
 import 'dialogs/add_topic.dart';
 import 'firebase/firebase.dart';
 import 'widgets/custom_text.dart';
@@ -16,7 +16,7 @@ class Home extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: TextCustom(
-          'Topics',
+          S.of(context).topics,
           fontSize: 25,
           bold: true,
           color: Theme.of(context).colorScheme.onPrimary,
@@ -24,7 +24,7 @@ class Home extends StatelessWidget {
         backgroundColor: Theme.of(context).primaryColor,
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 8.0),
+            padding: const EdgeInsetsDirectional.only(end: 16.0, start: 8.0),
             child: Material(
               color: Colors.transparent,
               child: InkWell(
@@ -87,16 +87,19 @@ class Home extends StatelessWidget {
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (topic.description != null && topic.description!.isNotEmpty)
+                      if (topic.description != null &&
+                          topic.description!.isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.only(top: 4),
                           child: TextCustom(
                             topic.description!,
                             fontSize: 14,
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
                           ),
                         ),
-                      if (topic.target != null && topic.target != 0)
+                      if (topic.target != 0)
                         Padding(
                           padding: const EdgeInsets.only(top: 4),
                           child: Row(
@@ -108,7 +111,7 @@ class Home extends StatelessWidget {
                               ),
                               const SizedBox(width: 4),
                               TextCustom(
-                                'Target: ${topic.target}',
+                                '${S.of(context).target}: ${topic.target}',
                                 fontSize: 12,
                                 color: Theme.of(context).colorScheme.primary,
                               ),
@@ -133,10 +136,10 @@ class Home extends StatelessWidget {
                     ],
                   ),
                   onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => HomeView(topic: topic)
-                      )
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => HomeView(topic: topic),
+                    ),
                   ),
                 ),
               );

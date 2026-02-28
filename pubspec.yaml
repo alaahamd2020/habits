@@ -35,22 +35,23 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   intl: ^0.20.2
-  firebase_core: ^3.15.1
-  cloud_firestore: ^5.6.11
-  json_annotation: ^4.9.0
-  get: ^4.7.2
-  firebase_auth: ^5.6.2
-  firebase_messaging: ^15.2.9
-
-#  temp
-  excel: ^4.0.6
+  firebase_core: ^4.4.0
+  cloud_firestore: ^6.1.2
+  json_annotation: ^4.11.0
+  get: ^4.7.3
+  firebase_auth: ^6.1.4
+  google_fonts: ^8.0.2
+  flutter_localizations:
+    sdk: flutter
+  shared_preferences: ^2.5.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  json_serializable: ^6.9.5
-  build_runner: ^2.5.4
+  json_serializable: ^6.13.0
+  build_runner: ^2.11.1
   flutter_launcher_icons:
+  intl_utils: ^2.8.14
 
 flutter_icons:
   android: true
@@ -62,7 +63,7 @@ flutter_icons:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

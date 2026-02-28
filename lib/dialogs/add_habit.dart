@@ -5,6 +5,7 @@ import 'package:habits/extension/on_date_time.dart';
 import 'package:habits/firebase/firebase.dart';
 import 'package:habits/model/habits_model.dart';
 import 'package:habits/model/topic_model.dart';
+import 'package:habits/generated/l10n.dart';
 import 'package:intl/intl.dart';
 import '../widgets/custom_text.dart';
 
@@ -15,10 +16,11 @@ class AddHabit extends StatefulWidget {
     showDialog(
       context: context,
       builder: (context) {
-        return AddHabit(topicModel: topicModel,);
+        return AddHabit(topicModel: topicModel);
       },
     );
   }
+
   @override
   State<AddHabit> createState() => _AddHabitState();
 }
@@ -31,14 +33,22 @@ class _AddHabitState extends State<AddHabit> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: FB.allHabits( widget.topicModel.id!),
+      stream: FB.allHabits(widget.topicModel.id!),
       builder: (context, asyncSnapshot) {
         final list = asyncSnapshot.data ?? [];
-        DateTime lastDay = list.lastOrNull?.date.toDate() ?? widget.topicModel.createdAt;
-        final canAdd = _dateTime.withoutTime.isBefore(DateTime.now().withoutTime);
+        DateTime lastDay =
+            list.lastOrNull?.date.toDate() ?? widget.topicModel.createdAt;
+        final canAdd = _dateTime.withoutTime.isBefore(
+          DateTime.now().withoutTime,
+        );
         final canSubtract = _dateTime.withoutTime.isAfter(lastDay);
-        final canSubmit = _dateTime.subtract(Duration(days: 1)).withoutTime.isBefore(DateTime.now().withoutTime) &&  _dateTime.add(Duration(days: 1)).withoutTime.isAfter(lastDay);
-        final canCount =  _count == 1;
+        final canSubmit =
+            _dateTime
+                .subtract(Duration(days: 1))
+                .withoutTime
+                .isBefore(DateTime.now().withoutTime) &&
+            _dateTime.add(Duration(days: 1)).withoutTime.isAfter(lastDay);
+        final canCount = _count == 1;
         return BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Dialog(
@@ -56,10 +66,10 @@ class _AddHabitState extends State<AddHabit> {
                     Theme.of(context).colorScheme.surface,
                     Theme.of(
                       context,
-                    ).colorScheme.surfaceVariant.withOpacity(0.8),
+                    ).colorScheme.surfaceContainerHighest.withOpacity(0.8),
                   ],
                 ),
-                
+
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
@@ -112,14 +122,14 @@ class _AddHabitState extends State<AddHabit> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               TextCustom(
-                                'Add New Habit',
+                                S.of(context).add_habit,
                                 fontSize: 22,
                                 bold: true,
                                 color: Theme.of(context).colorScheme.onSurface,
                               ),
                               const SizedBox(height: 4),
                               TextCustom(
-                                'Track your target',
+                                widget.topicModel.title,
                                 fontSize: 14,
                                 color: Theme.of(
                                   context,
@@ -159,7 +169,7 @@ class _AddHabitState extends State<AddHabit> {
                                 ),
                                 const SizedBox(width: 8),
                                 TextCustom(
-                                  'Select Date',
+                                  S.of(context).select_date,
                                   fontSize: 16,
                                   bold: true,
                                   color: Theme.of(
@@ -172,32 +182,40 @@ class _AddHabitState extends State<AddHabit> {
                           Container(
                             margin: const EdgeInsets.symmetric(horizontal: 16),
                             decoration: BoxDecoration(
-                              color:  Theme.of(context).colorScheme.surface,
+                              color: Theme.of(context).colorScheme.surface,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Row(
                               children: [
                                 // Previous Day Button
                                 IconButton(
-                                  onPressed: canSubtract ? () {
-                                    setState(() {
-                                        _dateTime = _dateTime.subtract(
-                                            Duration(days: 1));
-                                    });
-                                  }:null,
+                                  onPressed: canSubtract
+                                      ? () {
+                                          setState(() {
+                                            _dateTime = _dateTime.subtract(
+                                              Duration(days: 1),
+                                            );
+                                          });
+                                        }
+                                      : null,
                                   icon: Container(
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: !canSubtract ? Colors.grey.shade200 : Theme.of(
-                                        context,
-                                      ).colorScheme.primary.withOpacity(0.1),
+                                      color: !canSubtract
+                                          ? Colors.grey.shade200
+                                          : Theme.of(context)
+                                                .colorScheme
+                                                .primary
+                                                .withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Icon(
                                       Icons.chevron_left_rounded,
-                                      color:!canSubtract ? Colors.grey.shade500: Theme.of(
-                                        context,
-                                      ).colorScheme.primary,
+                                      color: !canSubtract
+                                          ? Colors.grey.shade500
+                                          : Theme.of(
+                                              context,
+                                            ).colorScheme.primary,
                                       size: 24,
                                     ),
                                   ),
@@ -227,7 +245,7 @@ class _AddHabitState extends State<AddHabit> {
                                         children: [
                                           TextCustom(
                                             DateFormat.EEEE(
-                                              'ar',
+                                              Intl.getCurrentLocale(),
                                             ).format(_dateTime),
                                             alignment: TextAlign.center,
                                             fontSize: 16,
@@ -254,26 +272,33 @@ class _AddHabitState extends State<AddHabit> {
 
                                 // Next Day Button
                                 IconButton(
-                                  onPressed: canAdd?() {
-                                    setState(() {
-                                      _dateTime = _dateTime.add(
-                                        Duration(days: 1),
-                                      );
-                                    });
-                                  }:null,
+                                  onPressed: canAdd
+                                      ? () {
+                                          setState(() {
+                                            _dateTime = _dateTime.add(
+                                              Duration(days: 1),
+                                            );
+                                          });
+                                        }
+                                      : null,
                                   icon: Container(
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: !canAdd ? Colors.grey.shade200 : Theme.of(
-                                        context,
-                                      ).colorScheme.primary.withOpacity(0.1),
+                                      color: !canAdd
+                                          ? Colors.grey.shade200
+                                          : Theme.of(context)
+                                                .colorScheme
+                                                .primary
+                                                .withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Icon(
                                       Icons.chevron_right_rounded,
-                                      color:  !canAdd ? Colors.grey.shade500 : Theme.of(
-                                        context,
-                                      ).colorScheme.primary,
+                                      color: !canAdd
+                                          ? Colors.grey.shade500
+                                          : Theme.of(
+                                              context,
+                                            ).colorScheme.primary,
                                       size: 24,
                                     ),
                                   ),
@@ -315,7 +340,7 @@ class _AddHabitState extends State<AddHabit> {
                                 ),
                                 const SizedBox(width: 8),
                                 TextCustom(
-                                  'Times',
+                                  S.of(context).times,
                                   fontSize: 16,
                                   bold: true,
                                   color: Theme.of(
@@ -335,24 +360,27 @@ class _AddHabitState extends State<AddHabit> {
                               children: [
                                 // Decrease Button
                                 IconButton(
-                                  onPressed: !canCount ? () {
-                                    setState(() {
-                                     _count--;
-                                    });
-                                  } : null,
+                                  onPressed: !canCount
+                                      ? () {
+                                          setState(() {
+                                            _count--;
+                                          });
+                                        }
+                                      : null,
                                   icon: Container(
                                     padding: const EdgeInsets.all(8),
                                     decoration: BoxDecoration(
-                                      color: canCount ? Colors.grey.shade200 : Theme.of(
-                                        context,
-                                      ).colorScheme.error.withOpacity(0.1),
+                                      color: canCount
+                                          ? Colors.grey.shade200
+                                          : Theme.of(context).colorScheme.error
+                                                .withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Icon(
                                       Icons.remove_rounded,
-                                      color: canCount ? Colors.grey.shade500 : Theme.of(
-                                        context,
-                                      ).colorScheme.error,
+                                      color: canCount
+                                          ? Colors.grey.shade500
+                                          : Theme.of(context).colorScheme.error,
                                       size: 24,
                                     ),
                                   ),
@@ -391,7 +419,7 @@ class _AddHabitState extends State<AddHabit> {
                                           ).colorScheme.secondary,
                                         ),
                                         TextCustom(
-                                          'times',
+                                          S.of(context).times,
                                           alignment: TextAlign.center,
                                           fontSize: 12,
                                           color: Theme.of(
@@ -445,7 +473,7 @@ class _AddHabitState extends State<AddHabit> {
                           child: TextButton(
                             onPressed: () => Navigator.pop(context),
                             style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 side: BorderSide(
@@ -456,7 +484,7 @@ class _AddHabitState extends State<AddHabit> {
                               ),
                             ),
                             child: TextCustom(
-                              'Cancel',
+                              S.of(context).cancel,
                               color: Theme.of(
                                 context,
                               ).colorScheme.onSurfaceVariant,
@@ -490,24 +518,29 @@ class _AddHabitState extends State<AddHabit> {
                               ],
                             ),
                             child: TextButton(
-                              onPressed: canSubmit ? ()  {
-                                final HabitsModel newData = HabitsModel(
-                                  '',
-                                  _count,
-                                  widget.topicModel.currentStreakAdd(lastDay, _dateTime),
-                                  _dateTime.toTimestamp,
-                                  widget.topicModel.id!,
-                                );
-                                FB.addHabit(
-                                  newData,
-                                );
-                                Navigator.pop(context);
-                              } : null,
+                              onPressed: canSubmit
+                                  ? () {
+                                      final HabitsModel newData = HabitsModel(
+                                        '',
+                                        _count,
+                                        widget.topicModel.currentStreakAdd(
+                                          lastDay,
+                                          _dateTime,
+                                        ),
+                                        _dateTime.toTimestamp,
+                                        widget.topicModel.id!,
+                                      );
+                                      FB.addHabit(newData);
+                                      Navigator.pop(context);
+                                    }
+                                  : null,
                               style: TextButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(
-                                  vertical: 16,
+                                  vertical: 12,
                                 ),
-                                backgroundColor: canSubmit ? Colors.transparent : Colors.grey,
+                                backgroundColor: canSubmit
+                                    ? Colors.transparent
+                                    : Colors.grey,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -524,7 +557,7 @@ class _AddHabitState extends State<AddHabit> {
                                   ),
                                   const SizedBox(width: 8),
                                   TextCustom(
-                                    'Add Habit',
+                                    S.of(context).add_habit,
                                     color: Theme.of(
                                       context,
                                     ).colorScheme.onPrimary,
@@ -544,13 +577,9 @@ class _AddHabitState extends State<AddHabit> {
             ),
           ),
         );
-
       },
-
     );
   }
-
-
 
   Future<DateTime?> addDate(DateTime lastDay) {
     return showDatePicker(
@@ -570,7 +599,4 @@ class _AddHabitState extends State<AddHabit> {
       },
     );
   }
-
 }
-
-

@@ -67,7 +67,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '531825533314',
     projectId: 'habits-81e2b',
     storageBucket: 'habits-81e2b.firebasestorage.app',
-    iosBundleId: 'com.example.habits',
+    iosBundleId: 'com.alaa.habits',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(

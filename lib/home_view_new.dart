@@ -6,6 +6,7 @@ import 'package:habits/firebase/firebase.dart';
 import 'package:habits/history_new.dart';
 import 'package:habits/model/habits_model.dart';
 import 'package:habits/widgets/custom_text.dart';
+import 'package:habits/generated/l10n.dart';
 import 'package:intl/intl.dart';
 import 'model/topic_model.dart';
 
@@ -26,7 +27,7 @@ class HomeView extends StatelessWidget {
         backgroundColor: Theme.of(context).primaryColor,
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 8.0),
+            padding: const EdgeInsetsDirectional.only(end: 16.0, start: 8.0),
             child: Material(
               color: Colors.transparent,
               child: InkWell(
@@ -68,7 +69,9 @@ class HomeView extends StatelessWidget {
               end: Alignment.bottomRight,
               colors: [
                 Theme.of(context).colorScheme.surface,
-                Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+                Theme.of(
+                  context,
+                ).colorScheme.surfaceContainerHighest.withOpacity(0.3),
               ],
             ),
           ),
@@ -78,9 +81,13 @@ class HomeView extends StatelessWidget {
             stream: FB.allHabits(topic.id!),
             builder: (context, asyncSnapshot) {
               final list = asyncSnapshot.data ?? [];
-              DateTime lastDay = list.lastOrNull?.date.toDate() ?? topic.createdAt;
-              final double targetProgress = (topic.currentStreak(lastDay) / topic.target).clamp(0, 1);
-              final listSortedStreak = list.where((element) => element.streak > 0).toList()..sort((a, b) => b.streak.compareTo(a.streak));
+              DateTime lastDay =
+                  list.lastOrNull?.date.toDate() ?? topic.createdAt;
+              final double targetProgress =
+                  (topic.currentStreak(lastDay) / topic.target).clamp(0, 1);
+              final listSortedStreak =
+                  list.where((element) => element.streak > 0).toList()
+                    ..sort((a, b) => b.streak.compareTo(a.streak));
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
@@ -92,8 +99,12 @@ class HomeView extends StatelessWidget {
                         end: Alignment.bottomRight,
                         colors: [
                           Theme.of(context).colorScheme.primary,
-                          Theme.of(context).colorScheme.primary.withOpacity(0.7),
-                          Theme.of(context).colorScheme.secondary.withOpacity(0.8),
+                          Theme.of(
+                            context,
+                          ).colorScheme.primary.withOpacity(0.7),
+                          Theme.of(
+                            context,
+                          ).colorScheme.secondary.withOpacity(0.8),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(24),
@@ -139,7 +150,7 @@ class HomeView extends StatelessWidget {
                             ),
                             12.space,
                             TextCustom(
-                              "Goal",
+                              S.of(context).goal,
                               fontSize: 24,
                               alignment: TextAlign.center,
                               color: Theme.of(context).colorScheme.onPrimary,
@@ -181,7 +192,7 @@ class HomeView extends StatelessWidget {
                                   ],
                                 ).createShader(bounds),
                                 child: Text(
-                                  "${ topic.currentStreak(lastDay) }",
+                                  "${topic.currentStreak(lastDay)}",
                                   style: TextStyle(
                                     fontSize: 56,
                                     fontWeight: FontWeight.bold,
@@ -206,7 +217,7 @@ class HomeView extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: TextCustom(
-                                  "Days",
+                                  S.of(context).days,
                                   fontSize: 14,
                                   color: Theme.of(context).colorScheme.primary,
                                   alignment: TextAlign.center,
@@ -231,7 +242,7 @@ class HomeView extends StatelessWidget {
                           ),
                           child: FractionallySizedBox(
                             widthFactor: targetProgress, // 60% progress
-                            alignment: Alignment.centerLeft,
+                            alignment: AlignmentDirectional.centerStart,
                             child: Container(
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
@@ -255,7 +266,7 @@ class HomeView extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             TextCustom(
-                              "Target",
+                              S.of(context).target,
                               fontSize: 12,
                               color: Theme.of(
                                 context,
@@ -276,7 +287,7 @@ class HomeView extends StatelessWidget {
                   // Last Activity Card
                   _buildInfoCard(
                     context,
-                    title: 'The Last',
+                    title: S.of(context).the_last,
                     icon: Icons.history,
                     child: Container(
                       padding: const EdgeInsets.all(16),
@@ -294,8 +305,10 @@ class HomeView extends StatelessWidget {
                         children: [
                           _buildInfoColumn(
                             context,
-                            "Day",
-                            DateFormat('EEEE').format(lastDay),
+                            S.of(context).day,
+                            DateFormat.EEEE(
+                              Intl.getCurrentLocale(),
+                            ).format(lastDay),
                             Icons.calendar_today,
                           ),
                           Container(
@@ -307,7 +320,7 @@ class HomeView extends StatelessWidget {
                           ),
                           _buildInfoColumn(
                             context,
-                            "Date",
+                            S.of(context).date,
                             DateFormat('yyyy/MM/dd').format(lastDay),
                             Icons.date_range,
                           ),
@@ -319,7 +332,7 @@ class HomeView extends StatelessWidget {
                   // Total Days Card
                   _buildInfoCard(
                     context,
-                    title: 'Total Times in This Period',
+                    title: S.of(context).total_times,
                     icon: Icons.today,
                     child: Container(
                       padding: const EdgeInsets.all(16),
@@ -335,15 +348,33 @@ class HomeView extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          _buildStatsColumn(context, "This Month",
-                              list.where((e) => e.isThisMonth).totalTimes.toString(),
-                              false),
-                          _buildStatsColumn(context, "This Week",
-                              list.where((e) => e.isThisWeek).totalTimes.toString(),
-                              true),
-                          _buildStatsColumn(context, "Last 3 Months",
-                              list.where((e) => e.isThis3Months).totalTimes.toString(),
-                              false),
+                          _buildStatsColumn(
+                            context,
+                            S.of(context).this_month,
+                            list
+                                .where((e) => e.isThisMonth)
+                                .totalTimes
+                                .toString(),
+                            false,
+                          ),
+                          _buildStatsColumn(
+                            context,
+                            S.of(context).this_week,
+                            list
+                                .where((e) => e.isThisWeek)
+                                .totalTimes
+                                .toString(),
+                            true,
+                          ),
+                          _buildStatsColumn(
+                            context,
+                            S.of(context).last_3_months,
+                            list
+                                .where((e) => e.isThis3Months)
+                                .totalTimes
+                                .toString(),
+                            false,
+                          ),
                         ],
                       ),
                     ),
@@ -352,7 +383,7 @@ class HomeView extends StatelessWidget {
                   // Longest Streak Card
                   _buildInfoCard(
                     context,
-                    title: 'Longest Streak',
+                    title: S.of(context).longest_streak,
                     icon: Icons.trending_up,
                     child: Container(
                       padding: const EdgeInsets.all(16),
@@ -368,9 +399,24 @@ class HomeView extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          _buildRankColumn(context, "2th", "${listSortedStreak.length > 1 ? listSortedStreak[1].streak : 0} Days", "🥈"),
-                          _buildRankColumn(context, "1st", "${listSortedStreak.firstOrNull?.streak??0} Days", "🥇"),
-                          _buildRankColumn(context, "3th", "${listSortedStreak.length > 2 ? listSortedStreak[2].streak : 0} Days", "🥉"),
+                          _buildRankColumn(
+                            context,
+                            S.of(context).second,
+                            "${listSortedStreak.length > 1 ? listSortedStreak[1].streak : 0} ${S.of(context).days}",
+                            "🥈",
+                          ),
+                          _buildRankColumn(
+                            context,
+                            S.of(context).first,
+                            "${listSortedStreak.firstOrNull?.streak ?? 0} ${S.of(context).days}",
+                            "🥇",
+                          ),
+                          _buildRankColumn(
+                            context,
+                            S.of(context).third,
+                            "${listSortedStreak.length > 2 ? listSortedStreak[2].streak : 0} ${S.of(context).days}",
+                            "🥉",
+                          ),
                         ],
                       ),
                     ),
@@ -386,7 +432,9 @@ class HomeView extends StatelessWidget {
                         end: Alignment.bottomRight,
                         colors: [
                           Theme.of(context).colorScheme.primary,
-                          Theme.of(context).colorScheme.primary.withOpacity(0.8),
+                          Theme.of(
+                            context,
+                          ).colorScheme.primary.withOpacity(0.8),
                         ],
                       ),
                       borderRadius: BorderRadius.circular(16),
@@ -403,7 +451,9 @@ class HomeView extends StatelessWidget {
                     child: TextButton(
                       onPressed: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => History(topicModel: topic,)),
+                        MaterialPageRoute(
+                          builder: (context) => History(topicModel: topic),
+                        ),
                       ),
                       style: ButtonStyle(
                         backgroundColor: WidgetStateProperty.all(
@@ -428,7 +478,7 @@ class HomeView extends StatelessWidget {
                           ),
                           12.space,
                           TextCustom(
-                            '${topic.title} History',
+                            S.of(context).history_with_name(topic.title),
                             fontSize: 18,
                             bold: true,
                             color: Theme.of(context).colorScheme.onPrimary,
@@ -439,12 +489,11 @@ class HomeView extends StatelessWidget {
                   ),
                 ],
               );
-            }
+            },
           ),
         ),
       ),
     );
-
   }
 
   // Helper Methods
@@ -456,7 +505,9 @@ class HomeView extends StatelessWidget {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+        color: Theme.of(
+          context,
+        ).colorScheme.surfaceContainerHighest.withOpacity(0.3),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: Theme.of(context).colorScheme.outline.withOpacity(0.1),

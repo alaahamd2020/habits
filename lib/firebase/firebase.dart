@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:get/get.dart';
 import 'package:habits/firebase/auth.dart';
 import 'package:habits/model/habits_model.dart';
 import 'package:habits/model/topic_model.dart';

@@ -21,19 +21,35 @@ class HabitsModel {
   factory HabitsModel.fromJson(Map<String, dynamic> map) =>
       _$HabitsModelFromJson(map);
 
-  bool get isThisWeek =>
-      date.toDate().isAfter(DateTime.now().subtract(Duration(days: 7)));
+  bool get isThisWeek {
+    final now = DateTime.now().withoutTime;
+    final habitDate = date.toDate().withoutTime;
+    return habitDate.isAfter(now.subtract(Duration(days: 7))) ||
+        habitDate.isAtSameMomentAs(now);
+  }
 
-  bool get isThisDay =>
-      date.toDate().isAfter(DateTime.now().subtract(Duration(days: 1)));
+  bool get isThisDay {
+    final now = DateTime.now().withoutTime;
+    final habitDate = date.toDate().withoutTime;
+    return habitDate.isAtSameMomentAs(now);
+  }
 
-  bool get isThisMonth =>
-      date.toDate().isAfter(DateTime.now().subtract(Duration(days: 30)));
+  bool get isThisMonth {
+    final now = DateTime.now().withoutTime;
+    final habitDate = date.toDate().withoutTime;
+    return habitDate.isAfter(now.subtract(Duration(days: 30))) ||
+        habitDate.isAtSameMomentAs(now);
+  }
 
-  bool get isThis3Months =>
-      date.toDate().isAfter(DateTime.now().subtract(Duration(days: 90)));
+  bool get isThis3Months {
+    final now = DateTime.now().withoutTime;
+    final habitDate = date.toDate().withoutTime;
+    return habitDate.isAfter(now.subtract(Duration(days: 90))) ||
+        habitDate.isAtSameMomentAs(now);
+  }
 
-  int toNextStreak(DateTime next) => next.difference(date.toDate()).inDays;
+  int toNextStreak(DateTime next) =>
+      next.withoutTime.difference(date.toDate().withoutTime).inDays;
 
   toJson() => _$HabitsModelToJson(this);
 
@@ -71,19 +87,23 @@ extension HabitsList on Iterable<HabitsModel> {
 
   int totalStreak(DateTime startTime) {
     final Timestamp lastDay = this.lastOrNull?.date ?? Timestamp.now();
-    final firstDay = firstOrNull?.date.toDate() ?? startTime;
-    final DateTime startDay = firstDay.isBefore(startTime)
+    final firstDay =
+        firstOrNull?.date.toDate().withoutTime ?? startTime.withoutTime;
+    final DateTime startDay = firstDay.isBefore(startTime.withoutTime)
         ? firstDay
-        : startTime;
-    final DateTime endDay = Timestamp.now().toDate().isAfter(lastDay.toDate())
-        ? Timestamp.now().toDate()
-        : lastDay.toDate();
+        : startTime.withoutTime;
+    final DateTime endDay =
+        DateTime.now().withoutTime.isAfter(lastDay.toDate().withoutTime)
+        ? DateTime.now().withoutTime
+        : lastDay.toDate().withoutTime;
     final int length = this
-        .where((element) => (element.date.toDate() != startDay.withoutTime) &&
-                (element.date.toDate() != endDay.withoutTime),)
+        .where(
+          (element) =>
+              (element.date.toDate() != startDay.withoutTime) &&
+              (element.date.toDate() != endDay.withoutTime),
+        )
         .toSet()
         .length;
-    print('length $length');
 
     final days = totalDays(startTime) - (length + 1);
 
@@ -91,15 +111,18 @@ extension HabitsList on Iterable<HabitsModel> {
   }
 
   int totalDays(DateTime startTime) {
-    if (isEmpty) return Timestamp.now().toDate().difference(startTime).inDays;
+    if (isEmpty)
+      return DateTime.now().withoutTime
+          .difference(startTime.withoutTime)
+          .inDays;
 
-    final lastDay = last.date.toDate();
-    final firstDay = first.date.toDate();
-    final endTime = Timestamp.now().toDate().isAfter(lastDay)
-        ? Timestamp.now().toDate()
+    final lastDay = last.date.toDate().withoutTime;
+    final firstDay = first.date.toDate().withoutTime;
+    final endTime = DateTime.now().withoutTime.isAfter(lastDay)
+        ? DateTime.now().withoutTime
         : lastDay;
-    final isBefore = firstDay.isBefore(startTime);
-    final DateTime startTime0 = isBefore ? firstDay : startTime;
+    final isBefore = firstDay.isBefore(startTime.withoutTime);
+    final DateTime startTime0 = isBefore ? firstDay : startTime.withoutTime;
     final days = (endTime.difference(startTime0).inDays);
     return days;
   }

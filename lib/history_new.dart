@@ -4,6 +4,7 @@ import 'package:habits/extension/on_num.dart';
 import 'package:habits/firebase/firebase.dart';
 import 'package:habits/model/habits_model.dart';
 import 'package:habits/widgets/custom_text.dart';
+import 'package:habits/generated/l10n.dart';
 import 'package:intl/intl.dart';
 import 'model/topic_model.dart';
 
@@ -16,10 +17,9 @@ class History extends StatelessWidget {
     return Scaffold(
       body: StreamBuilder(
         stream: FB.allHabits(topicModel.id!),
-        builder: (context,snapshot) {
+        builder: (context, snapshot) {
           final list = snapshot.data ?? [];
-          return
-          Container(
+          return Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
@@ -40,12 +40,13 @@ class History extends StatelessWidget {
                   elevation: 0,
                   backgroundColor: Colors.transparent,
                   flexibleSpace: FlexibleSpaceBar(
-                    stretchModes: [
-                      StretchMode.fadeTitle
-                    ],
+                    stretchModes: [StretchMode.fadeTitle],
                     background: Container(
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.only(bottomLeft: Radius.circular(32),bottomRight: Radius.circular(32)),
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(32),
+                          bottomRight: Radius.circular(32),
+                        ),
                         gradient: LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
@@ -56,14 +57,19 @@ class History extends StatelessWidget {
                         ),
                       ),
                       child: Padding(
-                        padding: const EdgeInsetsDirectional.only(top: 64,start:16),
+                        padding: const EdgeInsetsDirectional.only(
+                          top: 64,
+                          start: 16,
+                        ),
                         child: Row(
                           children: [
                             40.space,
                             Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.2),
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onPrimary.withOpacity(0.2),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Icon(
@@ -78,16 +84,22 @@ class History extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 TextCustom(
-                                  '${topicModel.title} History',
+                                  S
+                                      .of(context)
+                                      .history_with_name(topicModel.title),
                                   fontSize: 24,
                                   bold: true,
-                                  color: Theme.of(context).colorScheme.onPrimary,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimary,
                                 ),
                                 const SizedBox(height: 4),
                                 TextCustom(
-                                  'Track your journey',
+                                  S.of(context).track_your_journey,
                                   fontSize: 14,
-                                  color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.8),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimary.withOpacity(0.8),
                                 ),
                               ],
                             ),
@@ -99,7 +111,9 @@ class History extends StatelessWidget {
                   leading: Container(
                     margin: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.onPrimary.withOpacity(0.2),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onPrimary.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: IconButton(
@@ -125,7 +139,9 @@ class History extends StatelessWidget {
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.shadow.withOpacity(0.1),
                                 blurRadius: 10,
                                 offset: const Offset(0, 4),
                               ),
@@ -139,15 +155,16 @@ class History extends StatelessWidget {
                               _buildStatItem(
                                 context,
                                 icon: Icons.calendar_today,
-                                title: 'Total Days',
-                                value: "${list.totalDays(topicModel.createdAt)}",
+                                title: S.of(context).total_days,
+                                value:
+                                    "${list.totalDays(topicModel.createdAt)}",
                                 color: Theme.of(context).colorScheme.primary,
                               ),
                               _buildVerticalDivider(context),
                               _buildStatItem(
                                 context,
                                 icon: Icons.repeat,
-                                title: 'Total Times',
+                                title: S.of(context).total_times,
                                 value: "${list.totalTimes}",
                                 color: Theme.of(context).colorScheme.secondary,
                               ),
@@ -155,8 +172,10 @@ class History extends StatelessWidget {
                               _buildStatItem(
                                 context,
                                 icon: Icons.trending_up,
-                                title: 'Streak',
-                                value: list.totalStreak(topicModel.createdAt).toString(),
+                                title: S.of(context).streak,
+                                value: list
+                                    .totalStreak(topicModel.createdAt)
+                                    .toString(),
                                 color: Colors.green,
                               ),
                             ],
@@ -170,7 +189,9 @@ class History extends StatelessWidget {
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.shadow.withOpacity(0.1),
                                 blurRadius: 10,
                                 offset: const Offset(0, 4),
                               ),
@@ -182,7 +203,10 @@ class History extends StatelessWidget {
                               Container(
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.5),
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .primaryContainer
+                                      .withOpacity(0.5),
                                   borderRadius: const BorderRadius.only(
                                     topLeft: Radius.circular(16),
                                     topRight: Radius.circular(16),
@@ -192,42 +216,58 @@ class History extends StatelessWidget {
                                   children: [
                                     Icon(
                                       Icons.list_alt_rounded,
-                                      color: Theme.of(context).colorScheme.primary,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
                                       size: 20,
                                     ),
                                     const SizedBox(width: 8),
                                     TextCustom(
-                                      'History Records',
+                                      S.of(context).history,
                                       fontSize: 16,
                                       bold: true,
-                                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onPrimaryContainer,
                                     ),
                                   ],
                                 ),
                               ),
 
                               // History Items
-                              snapshot.connectionState == ConnectionState.waiting && list.isNotEmpty ? Center(child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: SizedBox(
-                                    width: 16,
-                                    height: 16,
-                                    child: CircularProgressIndicator()),
-                              ),) :
-                              ListView.separated(
-                                shrinkWrap: true,
-                                reverse: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: list.length, // Sample data
-                                separatorBuilder: (context, index) => Divider(
-                                  height: 1,
-                                  color: Theme.of(context).colorScheme.outline.withAlpha(80),
-                                ),
-                                itemBuilder: (context, index) => _buildHistoryItem(
-                                  context,list[index],
-                                  list.length - index
-                                ),
-                              ),
+                              snapshot.connectionState ==
+                                          ConnectionState.waiting &&
+                                      list.isNotEmpty
+                                  ? Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: SizedBox(
+                                          width: 16,
+                                          height: 16,
+                                          child: CircularProgressIndicator(),
+                                        ),
+                                      ),
+                                    )
+                                  : ListView.separated(
+                                      shrinkWrap: true,
+                                      reverse: true,
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      itemCount: list.length, // Sample data
+                                      separatorBuilder: (context, index) =>
+                                          Divider(
+                                            height: 1,
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.outline.withAlpha(80),
+                                          ),
+                                      itemBuilder: (context, index) =>
+                                          _buildHistoryItem(
+                                            context,
+                                            list[index],
+                                            list.length - index,
+                                          ),
+                                    ),
                             ],
                           ),
                         ),
@@ -238,15 +278,16 @@ class History extends StatelessWidget {
               ],
             ),
           );
-        }
+        },
       ),
     );
   }
 
-  Widget _buildStatItem(BuildContext context, {
+  Widget _buildStatItem(
+    BuildContext context, {
     required IconData icon,
     required String title,
-    required  value,
+    required value,
     required Color color,
   }) {
     return Column(
@@ -257,11 +298,7 @@ class History extends StatelessWidget {
             color: color.withOpacity(0.1),
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Icon(
-            icon,
-            color: color,
-            size: 24,
-          ),
+          child: Icon(icon, color: color, size: 24),
         ),
         const SizedBox(height: 8),
         TextCustom(
@@ -288,7 +325,7 @@ class History extends StatelessWidget {
     );
   }
 
-  Widget _buildHistoryItem(BuildContext context, HabitsModel item,int index) {
+  Widget _buildHistoryItem(BuildContext context, HabitsModel item, int index) {
     return Container(
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -339,54 +376,71 @@ class History extends StatelessWidget {
                     ),
                     const Spacer(),
                     Container(
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.secondaryContainer,
-                        borderRadius: BorderRadius.circular(8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
                       ),
-                      margin: EdgeInsets.only(right: 13),
+                      decoration: BoxDecoration(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.surfaceVariant.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.outline.withOpacity(0.2),
+                          width: 1,
+                        ),
+                      ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
-                            Icons.repeat,
-                            size: 14,
-                            color: Theme.of(context).colorScheme.onSecondaryContainer,
+                          // Times Metric
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.repeat_rounded,
+                                size: 14,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                              const SizedBox(width: 4),
+                              TextCustom(
+                                "${item.times}",
+                                fontSize: 13,
+                                bold: true,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 4),
-                          TextCustom(
-                            "${item.times}",
-                            fontSize: 14,
-                            bold: true,
-                            color: Theme.of(context).colorScheme.onSecondaryContainer,
+
+                          // Divider
+                          Container(
+                            height: 12,
+                            width: 1,
+                            margin: const EdgeInsets.symmetric(horizontal: 10),
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.outline.withOpacity(0.3),
                           ),
-                        ],
-                      ),
-                    ),
-                    // const Spacer(),
-                    Container(
-                      alignment: Alignment.center,
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.secondaryContainer,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      margin: EdgeInsets.only(right: 13),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.trending_up,
-                            size: 14,
-                            color: Theme.of(context).colorScheme.onSecondaryContainer,
-                          ),
-                          const SizedBox(width: 4),
-                          TextCustom(
-                            "${item.streak}",
-                            fontSize: 14,
-                            bold: true,
-                            color: Theme.of(context).colorScheme.onSecondaryContainer,
+
+                          // Streak Metric
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.local_fire_department_rounded,
+                                size: 14,
+                                color: Colors.orange[700],
+                              ),
+                              const SizedBox(width: 4),
+                              TextCustom(
+                                "${item.streak}",
+                                fontSize: 13,
+                                bold: true,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -403,16 +457,16 @@ class History extends StatelessWidget {
                     ),
                     const SizedBox(width: 4),
                     TextCustom(
-                      'Created: ${DateFormat('yyyy/MM/dd HH:mm').format(item.createdAt)}',
+                      '${S.of(context).date}: ${DateFormat('yyyy/MM/dd HH:mm').format(item.createdAt)}',
                       fontSize: 12,
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
-
                   ],
                 ),
               ],
             ),
           ),
+          const SizedBox(width: 8),
 
           // Delete Button
           Container(
